@@ -57,24 +57,24 @@ const initialState: {
   user?: UserType;
   inLogin: "signup" | "rejected" | "pending" | "" | "accepted" | "calling";
 } = {
-  // user: {
-  //   phone: 123123123,
-  //   type: UserEnum.KARFARMA,
-  //   access:
-  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxMDY4NDU0LCJpYXQiOjE3MzA5ODIwNTQsImp0aSI6IjJkZTMzZjE4YzdlZDQxMjE4ODc1MDY3ZWZiNzZkODM5IiwidXNlcl9pZCI6MX0.5JoAqU8gIMKwACVJTP0CYg94SvhkHS5yjppMzUfCQ3M",
-  //   user: {
-  //     id: 1,
-  //     active: true,
-  //     dataAccepted: true,
-  //     kifpool: 0,
-  //     last_login: new Date(),
-  //     location: "",
-  //     usertype: UserEnum.KARFARMA,
-  //     type: KarfarmaInnerType.DRUGSTORE_DOCTOR,
-  //     sms: 0,
-  //   },
-  // },
-  inLogin: "",
+  user: {
+    phone: 123123123,
+    type: UserEnum.KARFARMA,
+    access:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDE4OTE1LCJpYXQiOjE3MzE5MzI1MTUsImp0aSI6IjE1OTg5YjU4OGVlYjQyMWE4ZjY3M2MxNDI1MTlhOGRlIiwidXNlcl9pZCI6Mn0.or84wwu7GQYTpyfOB1DaHOJFWZQc0XgcJOMJUPAAbtg",
+    user: {
+      id: 1,
+      active: true,
+      dataAccepted: true,
+      kifpool: 0,
+      last_login: new Date(),
+      location: "",
+      usertype: UserEnum.KARFARMA,
+      type: KarfarmaInnerType.DRUGSTORE_DOCTOR,
+      sms: 0,
+    },
+  },
+  inLogin: "accepted",
 };
 
 const userSlice = createSlice({

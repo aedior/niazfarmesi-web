@@ -1,45 +1,165 @@
 "use client";
 
-export default function EVENTS() {
+import React from "react";
+import {
+  Card,
+  Row,
+  Col,
+  Typography,
+  Button,
+  Alert,
+  List,
+  Tag,
+  Statistic,
+  Progress,
+} from "antd";
+import {
+  FaExclamationTriangle,
+  FaCalendarAlt,
+  FaClock,
+  FaMapMarkerAlt,
+  FaCheckCircle,
+  FaBell,
+  FaUserMd,
+} from "react-icons/fa";
+
+const { Title, Text } = Typography;
+
+const EVENTS: React.FC = () => {
+  const upcomingEvents = [
+    {
+      title: "دوره‌ی بازآموزی گوارش",
+      date: "30 اردیبهشت",
+      icon: <FaClock className="text-blue-500" />,
+      color: "blue",
+    },
+    {
+      title: "سمینار تازه‌های داروسازی",
+      date: "15 خرداد",
+      location: "دانشکده داروسازی",
+      icon: <FaMapMarkerAlt className="text-green-500" />,
+      color: "green",
+    },
+    {
+      title: "پایان اعتبار پروانه فعالیت",
+      date: "10 تیر",
+      icon: <FaExclamationTriangle className="text-red-500" />,
+      color: "red",
+    },
+  ];
+
   return (
-    <div className="flex flex-col rounded-0 w-fit h-fit space-y-20px">
-      <div className="flex flex-col items-end rounded-16 w-870px h-206px py-24px pb-24px px-24px pr-24px space-y-24px drop-shadow-0px4px-000000 bg-ffffff">
-        <p className="rounded-0 w-fit h-fit text-212121 text-right font-medium text-lg">
-          هشدارهای امنیتی
-        </p>
-        <div className="flex flex-row items-center justify-between rounded-8 w-822px h-90px py-16px pb-16px px-14px pr-14px space-x-392px bg-ffc7c7">
-          <div className="flex flex-row items-center justify-center rounded-8 w-137px h-fit py-8px pb-8px px-16px pr-16px bg-e13636">
-            <p className="rounded-0 w-fit h-fit text-ffffff text-right font-medium text-sm">
-              متوجه شدم
-            </p>
-          </div>
-          <div className="flex flex-col items-end rounded-0 w-263px h-fit space-y-8px">
-            <p className="rounded-0 w-full h-fit text-e13636 text-e13636 text-right font-medium text-base">
-              کارجو 1 برای آگهی 1
-            </p>
-            <p className="rounded-0 w-full h-fit text-e13636 text-e13636 text-right text-sm">
-              لطفا مدارک شخص را با رزومه‌ی وی مقایسه کنید
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col relative items-end rounded-16 w-870px h-166px py-24px pb-24px px-22px pr-22px space-y-24px drop-shadow-0px4px-000000 bg-ffffff">
-        <p className="rounded-0 w-fit h-fit text-212121 text-right font-medium text-lg">
-          رویدادهای مهم
-        </p>
-        <div className="rounded-8 w-822px h-50px bg-deebfc"></div>
-        <p className="absolute top-[88px] left-[692px] rounded-0 w-140px h-26px text-212121 text-right font-medium text-base">
-          دوره‌ی بازآموزی گوارش
-        </p>
-        <p className="absolute top-[88px] left-[367px] rounded-0 w-141px h-26px text-212121 text-right font-medium text-base">
-          مهلت تا 30 اردیبهشت
-        </p>
-        <div className="absolute top-[83px] left-[34px] flex flex-row items-center justify-center rounded-8 w-141px h-fit py-8px pb-8px px-16px pr-16px bg-1967d2">
-          <p className="rounded-0 w-fit h-fit text-ffffff text-right font-medium text-sm">
-            مشاهده‌ی دوره
-          </p>
-        </div>
-      </div>
+    <div className="p-6 bg-gray-100 rounded-lg" dir="rtl">
+      <Title level={2} className="mb-6 text-right">
+        داشبورد رویدادها و هشدارها
+      </Title>
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={16}>
+          <Card
+            title={
+              <span className="flex items-center justify-between">
+                <span className="flex items-center">
+                  <FaBell className="text-yellow-500 mr-2" />
+                  هشدارها و رویدادهای مهم
+                </span>
+                <Tag color="blue">{upcomingEvents.length} رویداد</Tag>
+              </span>
+            }
+            className="w-full shadow-md"
+          >
+            <Alert
+              message="هشدار امنیتی"
+              description={
+                <div>
+                  <Text strong>کارجو 1 برای آگهی 1</Text>
+                  <br />
+                  <Text>لطفا مدارک شخص را با رزومه‌ی وی مقایسه کنید</Text>
+                </div>
+              }
+              type="error"
+              showIcon
+              icon={<FaExclamationTriangle />}
+              action={
+                <Button size="small" danger>
+                  متوجه شدم
+                </Button>
+              }
+              className="mb-4"
+            />
+            <List
+              itemLayout="horizontal"
+              dataSource={upcomingEvents}
+              renderItem={(item) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<div className="text-2xl">{item.icon}</div>}
+                    title={<Text strong>{item.title}</Text>}
+                    description={
+                      <div>
+                        <Tag color={item.color}>{item.date}</Tag>
+                        {item.location && (
+                          <Tag color="default">{item.location}</Tag>
+                        )}
+                      </div>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+            <div className="mt-4 text-left">
+              <Button type="primary" icon={<FaCalendarAlt />}>
+                مشاهده‌ی همه رویدادها
+              </Button>
+            </div>
+          </Card>
+        </Col>
+
+        <Col xs={24} lg={8}>
+          <Card className="w-full shadow-md mb-4">
+            <Statistic
+              title={
+                <span className="flex items-center">
+                  <FaUserMd className="mr-2 text-blue-500" /> وضعیت حرفه‌ای
+                </span>
+              }
+              value={93}
+              suffix="/ 100"
+              prefix={<FaCheckCircle className="text-green-500 mr-2" />}
+            />
+            <Progress percent={93} showInfo={false} strokeColor="#4CAF50" />
+            <Text type="secondary">امتیاز شما بر اساس فعالیت‌های حرفه‌ای</Text>
+          </Card>
+          <Card
+            title={
+              <span className="flex items-center">
+                <FaCalendarAlt className="text-green-500 mr-2" />
+                آمار رویدادها
+              </span>
+            }
+            className="w-full shadow-md"
+          >
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <Statistic
+                  title="رویدادهای آتی"
+                  value={5}
+                  prefix={<FaClock className="mr-2" />}
+                />
+              </Col>
+              <Col span={12}>
+                <Statistic
+                  title="رویدادهای گذشته"
+                  value={12}
+                  prefix={<FaCheckCircle className="mr-2" />}
+                />
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
-}
+};
+
+export default EVENTS;

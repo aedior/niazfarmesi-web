@@ -1,94 +1,153 @@
 "use client";
 
+import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/HOCs";
-import { useState } from "react";
-import { Button } from "reactstrap";
-import { TitledNumber } from "../UI";
 import { smsThunk } from "@/store/thunk/sms";
 import { SMS_PRICE } from "@/core";
+import {
+  FaSms,
+  FaPlus,
+  FaMoneyBillWave,
+  FaInfoCircle,
+  FaEnvelope,
+  FaShoppingCart,
+} from "react-icons/fa";
 
-function PriceSection(props: { count: number }) {
+interface User {
+  sms: number;
+  kifpool: number;
+}
+
+interface PriceSectionProps {
+  count: number;
+  onClick: () => void;
+}
+
+const PriceSection: React.FC<PriceSectionProps> = ({ count, onClick }) => {
   return (
-    <div className="bg-212121/10 group hover:bg-1967d2/50 aspect-square p-5 rounded-xl w-full h-36 flex items-center justify-center flex-col space-y-2">
-      <p className="text-3xl group-hover:text-white font-bold">
-        {Intl.NumberFormat("fa-IR").format(props.count)}
-      </p>
-      <p className="group-hover:text-white">عدد</p>
+    <div
+      onClick={onClick}
+      className="bg-gradient-to-br from-green-300 to-green-500 rounded-2xl p-4 text-center h-full flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:shadow-lg"
+    >
+      <FaSms className="text-white text-2xl mb-2" />
+      <h4 className="text-white text-xl font-bold m-0">
+        + {new Intl.NumberFormat("fa-IR").format(count)}
+      </h4>
+      <p className="text-white">عدد</p>
     </div>
   );
-}
-export default function SMS_PANEL() {
-  const [count, countHandler] = useState(0);
-  const user = useAppSelector((store) => store.user).user;
-  if (user?.user === undefined) return <></>;
+};
+
+const SMS_PANEL: React.FC = () => {
+  const [count, setCount] = useState<number>(100);
+  const user = useAppSelector((store) => store.user.user)?.user as
+    | User
+    | undefined;
   const dispatch = useAppDispatch();
+
+  if (user === undefined) return null;
+
   const price = count * SMS_PRICE;
 
+  const handleCountChange = (value: number | null) => {
+    if (value !== null) {
+      setCount(value);
+    }
+  };
+
+  const handleAddSMS = () => {
+    dispatch(smsThunk({ count }));
+    setCount(0);
+  };
+
   return (
-    <div className="flex flex-col rounded-16 w-full h-full bg-ffffff p-5">
-      <div className="w-full h-full flex flex-row justify-between space-x-20">
-        <div className="bg-1967d2/10 rounded-xl w-full h-auto flex flex-col p-5 space-y-5 text-right">
-          <div
-            className="flex w-full p-5 bg-5790df h-1/2 rounded-xl 
-            space-x-2 flex-row items-center justify-center"
-          >
-            <small className="text-white text-xl">عدد</small>
-            <p className=" text-white font-bold text-3xl">
-              {Intl.NumberFormat("fa-IR").format(user.user.sms)}
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col space-y-10 w-full px-5">
-          <div className="flex flex-row w-full h-full justify-between space-x-5">
-            {[50, 100, 200].map((count) => (
-              <Button onClick={() => countHandler(count)}>
-                <PriceSection count={count} />
-              </Button>
-            ))}
-          </div>
-          <TitledNumber
-            title="مبلغ مورد نظر را وارد کنید"
-            input={{
-              value: count,
-              onChange: (e) => countHandler(e.target.value),
-            }}
-          />
-          <div className="flex flex-row justify-between">
-            <Button
-              onClick={() => {
-                dispatch(smsThunk({ count }));
-                countHandler(0);
-              }}
-              className="bg-1967d2 p-3 rounded-xl px-10"
+    <div className="w-full bg-white rounded-3xl shadow-xl p-6" dir="rtl">
+      <div className="space-y-8">
+        <h2 className="text-3xl font-bold text-center mb-6">خرید پیامک</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <div className="grid grid-cols-3 gap-4">
+              {[50, 100, 200].map((amount) => (
+                <PriceSection
+                  key={amount}
+                  count={amount}
+                  onClick={() => setCount((c) => c + amount)}
+                />
+              ))}
+            </div>
+            <div className="relative">
+              <FaMoneyBillWave className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="number"
+                value={count}
+                onChange={(e) => handleCountChange(Number(e.target.value))}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                aria-label="تعداد پیامک مورد نظر"
+              />
+            </div>
+            <button
+              onClick={handleAddSMS}
+              className="w-full h-14 text-lg font-bold text-white bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl transition-all duration-300 hover:shadow-lg flex items-center justify-center"
             >
-              <p className="text-white">رفتن به صفحه پرداخت</p>
-            </Button>
-            <div className="flex flex-col items-end">
-              <div className="flex flex-row space-x-2 items-center">
-                <p>تومان</p>
-                <p className="font-bold text-xl">
-                  {Intl.NumberFormat("fa-IR").format(price)}
-                </p>
-              </div>
-              <div className="felx flex-row items-center justify-center">
-                <p className="text-xs">موجودی کیف پول پس از خرید</p>
-                <p
-                  style={{
-                    color: user.user.kifpool - price <= 0 ? "red" : "black",
-                  }}
-                  className="text-xs"
+              <FaShoppingCart className="ml-2" />
+              رفتن به صفحه پرداخت
+            </button>
+            <div className="flex justify-between items-center bg-gray-100 rounded-lg p-4">
+              <span className="text-gray-600">مبلغ قابل پرداخت:</span>
+              <span className="text-blue-600 font-bold text-lg">
+                {new Intl.NumberFormat("fa-IR").format(price)} تومان
+              </span>
+            </div>
+            <div className="text-gray-600 text-sm">
+              <p>
+                <FaInfoCircle className="inline ml-2" />
+                موجودی کیف پول پس از خرید:{" "}
+                <span
+                  className={
+                    user.kifpool - price <= 0
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }
                 >
-                  {user.user.kifpool - price <= 0
+                  {user.kifpool - price <= 0
                     ? "موجودی ناکافی"
-                    : Intl.NumberFormat("fa-IR").format(
-                        user.user.kifpool - price
-                      )}
-                </p>
+                    : `${new Intl.NumberFormat("fa-IR").format(
+                        user.kifpool - price
+                      )} تومان`}
+                </span>
+              </p>
+              <p>
+                <FaInfoCircle className="inline ml-2" />
+                پیامک‌ها بلافاصله پس از پرداخت به حساب شما اضافه می‌شوند.
+              </p>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-blue-600 to-blue-400 rounded-3xl p-8 shadow-lg transform hover:scale-105 transition-transform duration-300">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className="bg-white rounded-full p-4">
+                <FaEnvelope className="text-blue-600 text-5xl" />
+              </div>
+              <h3 className="text-white text-2xl font-bold">
+                پیامک‌های باقیمانده
+              </h3>
+              <h1 className="text-white text-5xl font-bold m-0">
+                {new Intl.NumberFormat("fa-IR").format(user.sms)}
+              </h1>
+              <p className="text-white text-2xl font-semibold">عدد</p>
+              <div className="flex items-center space-x-2 bg-blue-700 bg-opacity-30 rounded-full px-4 py-2">
+                <FaSms className="text-yellow-300" />
+                <span className="text-white mr-2">موجودی فعلی پیامک</span>
               </div>
             </div>
+            <p className="mt-6 text-white text-center">
+              <FaInfoCircle className="inline ml-2" />
+              پیامک‌های شما برای ارسال به مشتریان و اطلاع‌رسانی آماده است.
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SMS_PANEL;

@@ -1,144 +1,270 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  Button,
-  MapInput,
+  Form,
+  Input,
   Select,
-  TitledInput,
-  TitledNumber,
-  TitledSelect,
-  TitledTextArea,
-} from "@/components/UI";
+  InputNumber,
+  Button,
+  Card,
+  message,
+  Space,
+  ConfigProvider,
+} from "antd";
+import {
+  FaUser,
+  FaBriefcase,
+  FaClock,
+  FaDollarSign,
+  FaCheckSquare,
+  FaCreditCard,
+  FaMapMarkerAlt,
+  FaFileAlt,
+} from "react-icons/fa";
+import fa_IR from "antd/lib/locale/fa_IR";
+
+// Assuming these are imported from your existing code
+import { MapInput } from "@/components/UI";
 import { createNewRepotage } from "@/store/thunk/repotage";
 import { useAppDispatch } from "@/store/HOCs";
 import { KarjoEnum } from "@/store/user/slice";
 
-export default function NEW_REPOTAGE() {
-  const [gender, genderHandler] = useState<number | undefined>(0);
-  const [name, nameHandler] = useState<string>("");
-  const [location, locationHandler] = useState<{ lat: number; lng: number }>({
-    lat: 0,
-    lng: 0,
-  });
-  const [nameMotabar, nameMotabarHandler] = useState<number | undefined>(0);
-  const [nezam, nezamHandler] = useState<number | undefined>(0);
-  const [saatHamkari, saatHamkariHandler] = useState<string>("");
-  const [tarikhHamkari, tarikhHamkariHandler] = useState<string>("");
-  const [desc, descHandler] = useState<string>("");
-  const [price, priceHandler] = useState<number>(0);
+const { Option } = Select;
+const { TextArea } = Input;
+
+export default function FormAgahiShoghli() {
+  const [form] = Form.useForm();
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   const dispatch = useAppDispatch();
 
-  return (
-    <div className="flex flex-col items-center justify-center rounded-16 w-870px h-fit py-19px pb-19px px-18px pr-18px space-y-31px drop-shadow-0px4px-000000 bg-ffffff">
-      <p className="rounded-0 w-full h-fit text-212121 text-right font-medium text-lg">
-        ثبت آگهی جدید
-      </p>
-      <div className="items-center justify-center rounded-0 w-full h-fit grid grid-cols-2 gap-5">
-        <TitledSelect
-          title="جنسیت"
-          handler={genderHandler}
-          value={gender}
-          choices={{ 0: "مونث", 1: "مذکر", 2: "بدون اهمیت" }}
-          className="flex flex-row items-center justify-center border-1 border-c4c4c4 rounded-5 w-full h-42px min-w-240px px-8px pr-8px bg-ffffff"
-        />
-        <TitledSelect
-          title="عنوان شغل مورد نیاز"
-          value={name}
-          handler={nameHandler}
-          choices={{
-            [KarjoEnum.DAROKHANE]: "تکنسین داروخانه",
-            [KarjoEnum.ARAYESHI]: "تکنسین آرایشی و بهداشتی",
-            [KarjoEnum.SANDOGDAR]: "صندوقدار",
-            [KarjoEnum.ANBARDAR]: "انباردار",
-            [KarjoEnum.MASOLFANI]: "مسئول فنی",
-            [KarjoEnum.GAEMMAGAM]: "قائم مقام",
-            [KarjoEnum.KARAMOZ_DARO]: " کارآموز دارویی",
-            [KarjoEnum.KARAMOZ_ARAYESHI]: " کارآموز آرایشی و بهداشتی",
-          }}
-          className="flex flex-row items-center justify-center border-1 border-c4c4c4 rounded-5 w-full h-42px min-w-240px px-8px pr-8px bg-ffffff"
-        />
+  const onFinish = (values: any) => {
+    dispatch(
+      createNewRepotage({
+        gender: parseInt(values.gender),
+        onvan: values.jobTitle,
+        nameMotabar: parseInt(values.validLetter),
+        nezam: parseInt(values.professionalCard),
+        saatHamkari: values.workingHours,
+        tarikhHamkari: "",
+        price: values.salary,
+        desc: values.description,
+        lat: values.location.lat,
+        long: values.location.lng,
+      })
+    );
+    message.success("آگهی شغلی با موفقیت ایجاد شد!");
+  };
 
-        <TitledSelect
-          title="نامه معتبر از دانشگاه"
-          handler={nameMotabarHandler}
-          value={nameMotabar}
-          choices={{ 0: "دارد", 1: "ندارد", 2: "بدون اهمیت" }}
-          className="flex flex-row items-center justify-center border-1 border-c4c4c4 rounded-5 w-full h-42px min-w-240px px-8px pr-8px bg-ffffff"
-        />
-        <TitledSelect
-          title="کارت نظام"
-          handler={nezamHandler}
-          value={nezam}
-          choices={{ 0: "دارد", 1: "ندارد", 2: "بدون اهمیت" }}
-          className="flex flex-row items-center justify-center border-1 border-c4c4c4 rounded-5 w-full h-42px min-w-240px px-8px pr-8px bg-ffffff"
-        />
-        <TitledSelect
-          title="ساعت همکاری"
-          handler={saatHamkariHandler}
-          value={saatHamkari}
-          choices={{
-            1: "تمام وقت",
-            2: "نیمه وقت",
-            3: "پاره وقت",
-          }}
-          className="flex flex-row items-center justify-center border-1 border-c4c4c4 rounded-5 w-full h-42px min-w-240px px-8px pr-8px bg-ffffff"
-        />
-        <TitledInput
-          input={{
-            value: tarikhHamkari,
-            onChange: (e) => tarikhHamkariHandler(e.target.value),
-          }}
-          title="تاریخ همکاری"
-        />
-      </div>
-      <div className="flex flex-col items-end rounded-0 w-822px h-fit">
-        <p className="rounded-0 w-full h-fit text-212121 text-right font-medium text-sm">
-          موقعیت مکانی روی نقشه
-        </p>
-        <MapInput handler={locationHandler} />
-      </div>
-      <TitledNumber
-        input={{
-          value: price,
-          onChange: (e) => priceHandler(e.target.value),
-        }}
-        title="مبلغ پرداختی"
-        hint="مبلغ پرداختی به ازای هر ساعت کار"
-      />
-      <TitledTextArea
-        input={{
-          value: desc,
-          onChange: (e) => descHandler(e.target.value),
-        }}
-        title="توضیحات"
-        hint="توضیحات خود را برای کارجو بنویسید"
-      />
-      <div className="w-full">
-        <Button
-          onClick={() => {
-            dispatch(
-              createNewRepotage({
-                gender,
-                onvan: name,
-                nameMotabar,
-                nezam,
-                saatHamkari,
-                tarikhHamkari,
-                price,
-                desc,
-                lat: location.lat,
-                long: location.lng,
-              })
-            );
-          }}
-          className="flex flex-col items-center justify-center bg-1653c3 p-4 w-40 rounded-8 h-full bg-1bc455"
+  const handleLocationChange = (location: any) => {
+    form.setFieldsValue({ location });
+  };
+
+  const renderForm = () => (
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={onFinish}
+      initialValues={{
+        gender: "0",
+        validLetter: "0",
+        professionalCard: "0",
+      }}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Form.Item
+          name="gender"
+          label="جنسیت"
+          rules={[{ required: true, message: "لطفا جنسیت را انتخاب کنید" }]}
         >
-          <p className="rounded-0 w-fit h-fit text-ffffff font-bold text-sm">
-            ایجاد آگهی
-          </p>
-        </Button>
+          <Select>
+            <Option value="0">زن</Option>
+            <Option value="1">مرد</Option>
+            <Option value="2">بدون اهمیت</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="jobTitle"
+          label="عنوان شغلی"
+          rules={[
+            { required: true, message: "لطفا عنوان شغلی را انتخاب کنید" },
+          ]}
+        >
+          <Select>
+            {Object.entries({
+              [KarjoEnum.DAROKHANE]: "تکنسین داروخانه",
+              [KarjoEnum.ARAYESHI]: "تکنسین آرایشی و بهداشتی",
+              [KarjoEnum.SANDOGDAR]: "صندوقدار",
+              [KarjoEnum.ANBARDAR]: "انباردار",
+              [KarjoEnum.MASOLFANI]: "مسئول فنی",
+              [KarjoEnum.GAEMMAGAM]: "قائم مقام",
+              [KarjoEnum.KARAMOZ_DARO]: " کارآموز دارویی",
+              [KarjoEnum.KARAMOZ_ARAYESHI]: " کارآموز آرایشی و بهداشتی",
+            }).map(([key, value]) => (
+              <Option key={key} value={key}>
+                {value}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="validLetter"
+          label="نامه معتبر از دانشگاه"
+          rules={[
+            { required: true, message: "لطفا وضعیت نامه معتبر را انتخاب کنید" },
+          ]}
+        >
+          <Select>
+            <Option value="0">دارد</Option>
+            <Option value="1">ندارد</Option>
+            <Option value="2">بدون اهمیت</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="professionalCard"
+          label="کارت نظام"
+          rules={[
+            { required: true, message: "لطفا وضعیت کارت نظام را انتخاب کنید" },
+          ]}
+        >
+          <Select>
+            <Option value="0">دارد</Option>
+            <Option value="1">ندارد</Option>
+            <Option value="2">بدون اهمیت</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="workingHours"
+          label="ساعات کاری"
+          rules={[
+            { required: true, message: "لطفا ساعات کاری را انتخاب کنید" },
+          ]}
+        >
+          <Select>
+            <Option value="1">تمام وقت</Option>
+            <Option value="2">نیمه وقت</Option>
+            <Option value="3">انعطاف‌پذیر</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="salary"
+          label="حقوق ساعتی (تومان)"
+          rules={[{ required: true, message: "لطفا حقوق ساعتی را وارد کنید" }]}
+        >
+          <InputNumber
+            className="w-full"
+            formatter={(value) =>
+              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " تومان"
+            }
+            parser={(value) => (value as any).replace(/\s?تومان|,/g, "")}
+          />
+        </Form.Item>
       </div>
-    </div>
+      <Form.Item
+        name="description"
+        label="توضیحات"
+        rules={[{ required: true, message: "لطفا توضیحات را وارد کنید" }]}
+      >
+        <TextArea rows={4} />
+      </Form.Item>
+      <Form.Item
+        name="location"
+        label="موقعیت مکانی"
+        rules={[
+          { required: true, message: "لطفا موقعیت مکانی را انتخاب کنید" },
+        ]}
+      >
+        <MapInput handler={handleLocationChange} />
+      </Form.Item>
+    </Form>
+  );
+
+  const renderPreview = () => {
+    const values = form.getFieldsValue();
+    return (
+      <Card title="پیش‌نمایش آگهی شغلی">
+        <Space direction="vertical" size="middle" style={{ display: "flex" }}>
+          <div>
+            <FaBriefcase className="inline-block ml-2" /> عنوان شغلی:{" "}
+            {KarjoEnum[values.jobTitle]}
+          </div>
+          <div>
+            <FaUser className="inline-block ml-2" /> جنسیت:{" "}
+            {values.gender === "0"
+              ? "زن"
+              : values.gender === "1"
+              ? "مرد"
+              : "بدون اهمیت"}
+          </div>
+          <div>
+            <FaClock className="inline-block ml-2" /> ساعات کاری:{" "}
+            {values.workingHours === "1"
+              ? "تمام وقت"
+              : values.workingHours === "2"
+              ? "نیمه وقت"
+              : "انعطاف‌پذیر"}
+          </div>
+          <div>
+            <FaDollarSign className="inline-block ml-2" /> حقوق ساعتی:{" "}
+            {values.salary} تومان
+          </div>
+          <div>
+            <FaCheckSquare className="inline-block ml-2" /> نامه معتبر از
+            دانشگاه:{" "}
+            {values.validLetter === "0"
+              ? "دارد"
+              : values.validLetter === "1"
+              ? "ندارد"
+              : "بدون اهمیت"}
+          </div>
+          <div>
+            <FaCreditCard className="inline-block ml-2" /> کارت نظام:{" "}
+            {values.professionalCard === "0"
+              ? "دارد"
+              : values.professionalCard === "1"
+              ? "ندارد"
+              : "بدون اهمیت"}
+          </div>
+          <div>
+            <FaMapMarkerAlt className="inline-block ml-2" /> موقعیت مکانی:{" "}
+            {values.location
+              ? `عرض ${values.location.lat.toFixed(
+                  4
+                )}، طول ${values.location.lng.toFixed(4)}`
+              : "مشخص نشده"}
+          </div>
+          <div>
+            <FaFileAlt className="inline-block ml-2" /> توضیحات:{" "}
+            {values.description}
+          </div>
+        </Space>
+      </Card>
+    );
+  };
+
+  return (
+    <ConfigProvider locale={fa_IR} direction="rtl">
+      <div
+        className="max-w-4xl mx-auto p-6 space-y-8 w-full bg-white rounded-xl"
+        style={{ direction: "rtl" }}
+      >
+        <h1 className="text-3xl font-bold text-center">ایجاد آگهی شغلی جدید</h1>
+        {isPreviewMode ? renderPreview() : renderForm()}
+        <div className="flex justify-end space-x-4 rtl:space-x-reverse">
+          <Button onClick={() => setIsPreviewMode(!isPreviewMode)}>
+            {isPreviewMode ? "ویرایش" : "پیش‌نمایش"}
+          </Button>
+          {!isPreviewMode && (
+            <Button
+              type="primary"
+              onClick={() => form.submit()}
+              className="bg-1967d2"
+            >
+              ایجاد آگهی شغلی
+            </Button>
+          )}
+        </div>
+      </div>
+    </ConfigProvider>
   );
 }

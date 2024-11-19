@@ -1,217 +1,136 @@
 "use client";
 
-import { useAppSelector, useAppDispatch } from "@/store/HOCs";
-import { useState, useEffect } from "react";
-import { FileUpload, Select } from "@/components/UI";
+import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/HOCs";
+import { smsThunk } from "@/store/thunk/sms";
+import { SMS_PRICE } from "@/core";
+import { Button, Input, Progress } from "antd";
+import { FaSms, FaWallet, FaShoppingCart, FaEnvelope } from "react-icons/fa";
 
-export default function PROFILE() {
-  const [banner, bannerHandler] = useState();
-  const [email, emailHandler] = useState<string>("");
-  const [noFaaliat, noFaaliatHandler] = useState<number | undefined>();
-  const [address, addressHandler] = useState<string>("");
-  const [moassesName, moassesNameHandler] = useState<string>("");
-  const [phone, phoneHandler] = useState<string>("");
-  const [date, dateHandler] = useState<string>("");
+function PriceSection({
+  count,
+  onClick,
+}: {
+  count: number;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      onClick={onClick}
+      className="bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white aspect-square p-5 rounded-xl w-full h-36 flex items-center justify-center flex-col space-y-2 transition duration-300 shadow-lg hover:shadow-xl"
+    >
+      <p className="text-3xl font-bold">
+        {Intl.NumberFormat("fa-IR").format(count)}
+      </p>
+      <p className="text-sm">عدد</p>
+    </Button>
+  );
+}
+
+export default function SMS_PANEL() {
+  const [count, setCount] = useState(0);
+  const user = useAppSelector((store) => store.user).user;
   const dispatch = useAppDispatch();
-  const [website, websiteHandler] = useState<string>("");
-  const [rubika, rubikaHandler] = useState<string>("");
-  const [phoneMajazi, phoneMajaziHandler] = useState<string>("");
+  const price = count * SMS_PRICE;
+
+  if (!user?.user) return null;
+
+  const maxSMS = 1000; // Assuming a max of 1000 SMS for the progress bar
+  const smsPercentage = (user.user.sms / maxSMS) * 100;
 
   return (
-    <div className="flex flex-col rounded-0 w-870px h-fit space-y-40px">
-      <div className="flex flex-col items-center justify-center rounded-16 w-full h-fit py-24px pb-24px px-23px pr-23px space-y-36px drop-shadow-0px4px-000000 bg-ffffff">
-        <div className="flex flex-row justify-between rounded-0 w-full h-fit space-x-331px">
-          <div className="flex flex-col justify-center rounded-0 w-fit h-fit space-y-24px">
-            <FileUpload
-              text={"ارسال"}
-              name={"karfarma_banner"}
-              value={banner}
-              handler={bannerHandler}
-              className="flex flex-col relative items-center justify-center rounded-8 w-166px h-fit py-8px pb-8px bg-007ef3 text-ffffff font-medium text-sm"
+    <div
+      className="flex flex-col rounded-lg w-full h-full bg-gradient-to-br from-blue-50 to-white p-6 shadow-lg"
+      dir="rtl"
+    >
+      <div className="w-full h-full flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 md:space-x-6 md:space-x-reverse">
+        <div className="bg-white rounded-xl w-full md:w-1/3 h-auto flex flex-col p-6 space-y-6 shadow-md">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="relative">
+              <FaEnvelope className="text-blue-500 text-6xl" />
+              <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                {user.user.sms}
+              </div>
+            </div>
+            <Progress
+              type="circle"
+              percent={Math.round(smsPercentage)}
+              format={() =>
+                `${Intl.NumberFormat("fa-IR").format(user.user.sms)}`
+              }
+              strokeColor={{
+                "0%": "#3B82F6",
+                "100%": "#1D4ED8",
+              }}
+              className="text-2xl font-bold"
             />
-            <FileUpload
-              text={"آپلود بنر"}
-              name={"karfarma_banner"}
-              value={banner}
-              handler={bannerHandler}
-              className="flex flex-col relative items-center justify-center rounded-8 w-166px h-fit py-8px pb-8px bg-007ef3 text-ffffff font-medium text-sm"
-            />
+            <p className="text-gray-600 text-sm">پیامک های باقی مانده</p>
           </div>
-          <p className="rounded-0 w-fit h-fit text-212121 text-right font-medium text-lg">
-            پروفایل من
-          </p>
         </div>
-        <div className="flex flex-row items-center rounded-0 w-fit h-fit space-x-35px">
-          <div className="flex flex-col items-end rounded-0 w-355px h-fit space-y-14px">
-            <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-              <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-                ایمیل
-              </p>
-              <input
-                dir={"rtl"}
-                value={email}
-                onChange={(e) => emailHandler(e.target.value)}
-                className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
+        <div className="flex flex-col space-y-6 w-full md:w-2/3">
+          <div className="grid grid-cols-3 gap-4">
+            {[50, 100, 200].map((value) => (
+              <PriceSection
+                key={value}
+                count={value}
+                onClick={() => setCount(value)}
               />
-            </div>
-            <div className="flex flex-col items-end justify-center rounded-0 w-full h-92px min-h-40px space-y-8px">
-              <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-                نوع فعالیت
-              </p>
-              <Select
-                handler={noFaaliatHandler}
-                value={noFaaliat}
-                choices={{
-                  0: "شبانه روزی",
-                  1: "درمانگاه",
-                  2: "غیره",
-                }}
-                className="flex flex-row items-center justify-center border-1 border-c4c4c4 rounded-5 w-full h-42px min-w-240px px-8px pr-8px bg-ffffff"
-              />
-            </div>
-            <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-              <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-                آدرس پروفایل
-              </p>
-              <input
-                dir={"rtl"}
-                value={address}
-                onChange={(e) => addressHandler(e.target.value)}
-                className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
-              />
-            </div>
+            ))}
           </div>
-          <div className="flex flex-col rounded-0 w-353px h-fit space-y-15px">
-            <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-              <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-                نام موسس
-              </p>
-              <input
-                dir={"rtl"}
-                value={moassesName}
-                onChange={(e) => moassesNameHandler(e.target.value)}
-                className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
-              />
-            </div>
-            <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-              <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-                شماره تلفن
-              </p>
-              <input
-                dir={"rtl"}
-                value={phone}
-                onChange={(e) => phoneHandler(e.target.value)}
-                className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
-              />
-            </div>
-            <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-              <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-                تاریخ تاسیس
-              </p>
-              <input
-                dir={"rtl"}
-                value={date}
-                onChange={(e) => dateHandler(e.target.value)}
-                className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
-              />
+          <div className="space-y-2">
+            <label
+              htmlFor="custom-count"
+              className="block text-sm font-medium text-gray-700"
+            >
+              مبلغ مورد نظر را وارد کنید
+            </label>
+            <Input
+              id="custom-count"
+              value={count}
+              onChange={(e) => setCount(Number(e.target.value))}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <Button
+              onClick={() => {
+                dispatch(smsThunk({ count }));
+                setCount(0);
+              }}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center space-x-2 space-x-reverse shadow-md hover:shadow-lg"
+            >
+              <FaShoppingCart className="text-xl" />
+              <span>رفتن به صفحه پرداخت</span>
+            </Button>
+            <div className="flex flex-col items-end">
+              <div className="flex flex-row space-x-2 space-x-reverse items-center">
+                <p className="font-bold text-2xl text-blue-600">
+                  {Intl.NumberFormat("fa-IR").format(price)}
+                </p>
+                <p className="text-gray-600">تومان</p>
+              </div>
+              <div className="flex flex-row items-center justify-center space-x-2 space-x-reverse">
+                <FaWallet className="text-gray-500" />
+                <p className="text-sm text-gray-500">
+                  موجودی کیف پول پس از خرید:
+                </p>
+                <p
+                  className={`text-sm font-medium ${
+                    user.user.kifpool - price <= 0
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }`}
+                >
+                  {user.user.kifpool - price <= 0
+                    ? "موجودی ناکافی"
+                    : Intl.NumberFormat("fa-IR").format(
+                        user.user.kifpool - price
+                      )}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-        <button
-          onClick={() => {
-            // dispatch(Frame48096400Thunk({}));
-          }}
-          className="flex flex-col items-center justify-center rounded-8 w-full h-full bg-f3bd00"
-        >
-          <p className="rounded-0 w-fit h-fit text-ffffff font-bold text-sm">
-            ویرایش اطلاعات
-          </p>
-        </button>
-      </div>
-      <div className="flex flex-col items-center justify-center rounded-16 w-full h-fit py-24px pb-24px px-24px pr-24px space-y-28px drop-shadow-0px4px-000000 bg-ffffff">
-        <div className="flex flex-row items-center justify-end rounded-0 w-822px h-fit">
-          <p className="rounded-0 w-fit h-fit text-212121 text-right font-medium text-lg">
-            شبکه‌های اجتماعی
-          </p>
-        </div>
-        <div className="flex flex-row rounded-0 w-fit h-fit space-x-15px">
-          <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-            <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-              وبسایت
-            </p>
-            <input
-              dir={"rtl"}
-              value={website}
-              onChange={(e) => websiteHandler(e.target.value)}
-              className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
-            />
-          </div>
-          <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-            <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-              روبیکا
-            </p>
-            <input
-              dir={"rtl"}
-              value={rubika}
-              onChange={(e) => rubikaHandler(e.target.value)}
-              className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
-            />
-          </div>
-        </div>
-        <button
-          onClick={() => {
-            // dispatch(Frame48096403Thunk({}));
-          }}
-          className="flex flex-col items-center justify-center rounded-8 w-full h-full bg-f3bd00"
-        >
-          <p className="rounded-0 w-fit h-fit text-ffffff font-bold text-sm">
-            افزودن شبکه اجتماعی
-          </p>
-        </button>
-      </div>
-      <div className="flex flex-col items-center rounded-16 w-full h-fit py-24px pb-24px px-24px pr-24px space-y-24px drop-shadow-0px4px-000000 bg-ffffff">
-        <div className="flex flex-col items-end rounded-0 w-822px h-fit">
-          <p className="rounded-0 w-full h-fit text-212121 text-right font-medium text-lg">
-            اطلاعات تماس
-          </p>
-        </div>
-        <div className="flex flex-row rounded-0 w-fit h-fit space-x-15px">
-          <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-            <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-              شماره موبایل متصل به روبیکا،واتس‌آپ یا تلگرام
-            </p>
-            <input
-              dir={"rtl"}
-              value={phoneMajazi}
-              onChange={(e) => phoneMajaziHandler(e.target.value)}
-              className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
-            />
-          </div>
-          <div className="flex flex-col items-end rounded-0 w-353px h-fit min-h-40px space-y-8px">
-            <p className="rounded-0 w-full h-fit text-1e1e1e text-right text-sm">
-              تلفن داروخانه/ شرکت
-            </p>
-            <input
-              dir={"rtl"}
-              value={phone}
-              onChange={(e) => phoneHandler(e.target.value)}
-              className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
-            />
-          </div>
-        </div>
-        <p className="rounded-0 w-full h-fit text-212121 text-right font-medium text-sm">
-          موقعیت مکانی روی نقشه
-        </p>
-        <button
-          onClick={() => {
-            // dispatch(Frame48096408Thunk({}));
-          }}
-          className="flex flex-col items-center justify-center rounded-8 w-full h-full bg-f3bd00"
-        >
-          <p className="rounded-0 w-fit h-fit text-ffffff font-bold text-sm">
-            ویرایش اطلاعات
-          </p>
-        </button>
       </div>
     </div>
   );

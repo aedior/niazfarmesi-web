@@ -1,66 +1,128 @@
 "use client";
 
+import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/HOCs";
-import { Button, TitledNumber } from "../UI";
-import { useState } from "react";
 import { kifpoolThunk } from "@/store/thunk/kifpool";
+import {
+  FaWallet,
+  FaPlus,
+  FaDollarSign,
+  FaMoneyBillWave,
+  FaInfoCircle,
+  FaCoins,
+} from "react-icons/fa";
 
-function PriceSection(props: { price: number }) {
-  return (
-    <div className="bg-212121/10 group hover:bg-1967d2/50 aspect-square p-5 rounded-xl w-full h-36 flex items-center justify-center flex-col space-y-2">
-      <p className="text-xl group-hover:text-white font-bold">
-        + {Intl.NumberFormat("fa-IR").format(props.price)}
-      </p>
-      <p className="group-hover:text-white">تومان</p>
-    </div>
-  );
+interface User {
+  kifpool: number;
 }
 
-export default function Kifpool() {
-  const [price, priceHandler] = useState(100000);
-  const user = useAppSelector((store) => store.user.user.user);
+interface PriceSectionProps {
+  price: number;
+  onClick: () => void;
+}
+
+const PriceSection: React.FC<PriceSectionProps> = ({ price, onClick }) => {
+  return (
+    <div
+      onClick={onClick}
+      className="bg-gradient-to-br from-yellow-300 to-orange-400 rounded-2xl p-4 text-center h-full flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:shadow-lg"
+    >
+      <FaDollarSign className="text-white text-2xl mb-2" />
+      <h4 className="text-white text-xl font-bold m-0">
+        + {new Intl.NumberFormat("fa-IR").format(price)}
+      </h4>
+      <p className="text-white">تومان</p>
+    </div>
+  );
+};
+
+const Kifpool: React.FC = () => {
+  const [price, setPrice] = useState<number>(100000);
+  const user = useAppSelector((store) => store.user.user)?.user as
+    | User
+    | undefined;
   const dispatch = useAppDispatch();
 
+  if (user === undefined) return null;
+
+  const handlePriceChange = (value: number | null) => {
+    if (value !== null) {
+      setPrice(value);
+    }
+  };
+
+  const handleAddToWallet = () => {
+    dispatch(kifpoolThunk({ price }));
+  };
+
   return (
-    <div className="flex flex-col rounded-16 w-full h-full bg-ffffff p-5">
-      <div className="w-full h-full flex flex-row justify-between space-x-20">
-        <div className=" rounded-xl w-full h-auto flex flex-col p-5 px-20 space-y-5 text-right">
-          <p className="text-xl">موجودی کیف پول</p>
-          <div
-            className="flex w-full p-5 bg-5790df h-1/2 rounded-xl 
-            space-x-2 flex-row items-center justify-center"
-          >
-            <small className="text-white text-xl">تومان</small>
-            <p className=" text-white font-bold text-3xl">
-              {Intl.NumberFormat("fa-IR").format(user?.kifpool)}
+    <div className="w-full bg-white rounded-3xl shadow-xl p-6">
+      <div className="space-y-8">
+        <h2 className="text-3xl font-bold text-center mb-6">کیف پول</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-gradient-to-br from-blue-600 to-blue-400 rounded-3xl p-8 shadow-lg transform hover:scale-105 transition-transform duration-300">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className="bg-white rounded-full p-4">
+                <FaWallet className="text-blue-600 text-5xl" />
+              </div>
+              <h3 className="text-white text-2xl font-bold">موجودی کیف پول</h3>
+              <h1 className="text-white text-5xl font-bold m-0">
+                {new Intl.NumberFormat("fa-IR").format(user.kifpool)}
+              </h1>
+              <p className="text-white text-2xl font-semibold">تومان</p>
+              <div className="flex items-center space-x-2 bg-blue-700 bg-opacity-30 rounded-full px-4 py-2">
+                <FaCoins className="text-yellow-300" />
+                <span className="text-white mr-2">موجودی فعلی</span>
+              </div>
+            </div>
+            <p className="mt-6 text-white text-center">
+              <FaInfoCircle className="inline ml-2" />
+              کیف پول شما امن و قابل استفاده برای تمام خدمات ما است.
             </p>
           </div>
-        </div>
-        <div className="flex flex-col space-y-10 w-full px-5">
-          <div className="flex flex-row w-full h-full justify-between space-x-5">
-            {[50000, 100000, 200000].map((price) => (
-              <Button onClick={() => priceHandler((p) => p + price)}>
-                <PriceSection price={price} />
-              </Button>
-            ))}
+          <div className="space-y-6">
+            <div className="grid grid-cols-3 gap-4">
+              {[50000, 100000, 200000].map((amount) => (
+                <PriceSection
+                  key={amount}
+                  price={amount}
+                  onClick={() => setPrice((p) => p + amount)}
+                />
+              ))}
+            </div>
+            <div className="relative">
+              <FaMoneyBillWave className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => handlePriceChange(Number(e.target.value))}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                aria-label="مبلغ مورد نظر"
+              />
+            </div>
+            <button
+              onClick={handleAddToWallet}
+              className="w-full h-14 text-lg font-bold text-white bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl transition-all duration-300 hover:shadow-lg flex items-center justify-center"
+            >
+              <FaPlus className="ml-2" />
+              رفتن به صفحه پرداخت
+            </button>
+            <div className="text-gray-600 text-sm">
+              <p>
+                <FaInfoCircle className="inline ml-2" />
+                پرداخت از طریق درگاه‌های امن بانکی انجام می‌شود.
+              </p>
+              <p>
+                <FaInfoCircle className="inline ml-2" />
+                مبلغ شارژ شده بلافاصله به کیف پول شما اضافه خواهد شد.
+              </p>
+            </div>
           </div>
-          <TitledNumber
-            title="مبلغ مورد نظر را وارد کنید"
-            input={{
-              value: price,
-              onChange: (e) => priceHandler(e.target.value),
-            }}
-          />
-          <Button
-            onClick={() => {
-              dispatch(kifpoolThunk({ price }));
-            }}
-            className="bg-1967d2 p-3 rounded-xl"
-          >
-            <p className="text-white">رفتن به صفحه پرداخت</p>
-          </Button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Kifpool;

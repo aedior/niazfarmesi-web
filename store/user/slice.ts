@@ -4,6 +4,7 @@ import { SendKarfarmaInnerTypeThunk } from "./thunk";
 import { kifpoolThunk } from "../thunk/kifpool";
 import { smsThunk } from "../thunk/sms";
 import { SMS_PRICE } from "@/core";
+import type { UploadFile } from "antd/es/upload/interface";
 
 export enum UserEnum {
   KARFARMA = 1,
@@ -32,6 +33,21 @@ export interface KarfarmaType extends AllUsers {
 }
 export interface KarjoType extends AllUsers {
   usertype: UserEnum.KARJO;
+  profilePicture?: UploadFile[];
+  jobTitle: string;
+  firstName: string;
+  lastName: string;
+  birthDate: Date;
+  gender: "male" | "female";
+  location: string;
+  education: "student" | "diploma" | "bachelor" | "master" | "phd";
+  workExperience: "yes" | "no";
+  militaryService: "exempt" | "included" | "completed";
+  nationalId: string;
+  referralCode?: string;
+  educationFile?: UploadFile[];
+  workExperienceFile?: UploadFile[];
+  militaryServiceFile?: UploadFile[];
 }
 
 export enum KarjoEnum {
@@ -57,24 +73,24 @@ const initialState: {
   user?: UserType;
   inLogin: "signup" | "rejected" | "pending" | "" | "accepted" | "calling";
 } = {
-  user: {
-    phone: 123123123,
-    type: UserEnum.KARFARMA,
-    access:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDE4OTE1LCJpYXQiOjE3MzE5MzI1MTUsImp0aSI6IjE1OTg5YjU4OGVlYjQyMWE4ZjY3M2MxNDI1MTlhOGRlIiwidXNlcl9pZCI6Mn0.or84wwu7GQYTpyfOB1DaHOJFWZQc0XgcJOMJUPAAbtg",
-    user: {
-      id: 1,
-      active: true,
-      dataAccepted: true,
-      kifpool: 0,
-      last_login: new Date(),
-      location: "",
-      usertype: UserEnum.KARFARMA,
-      type: KarfarmaInnerType.DRUGSTORE_DOCTOR,
-      sms: 0,
-    },
-  },
-  inLogin: "accepted",
+  // user: {
+  //   phone: 123123123,
+  //   type: UserEnum.KARFARMA,
+  //   access:
+  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDE4OTE1LCJpYXQiOjE3MzE5MzI1MTUsImp0aSI6IjE1OTg5YjU4OGVlYjQyMWE4ZjY3M2MxNDI1MTlhOGRlIiwidXNlcl9pZCI6Mn0.or84wwu7GQYTpyfOB1DaHOJFWZQc0XgcJOMJUPAAbtg",
+  //   user: {
+  //     id: 1,
+  //     active: true,
+  //     dataAccepted: true,
+  //     kifpool: 0,
+  //     last_login: new Date(),
+  //     location: "",
+  //     usertype: UserEnum.KARFARMA,
+  //     type: KarfarmaInnerType.DRUGSTORE_DOCTOR,
+  //     sms: 0,
+  //   },
+  // },
+  inLogin: "",
 };
 
 const userSlice = createSlice({

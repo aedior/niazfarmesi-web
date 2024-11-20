@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { createNewReportage } from "../thunk/createNewReportage ";
 
 // Types
 export enum ResumeStatus {
@@ -198,6 +199,20 @@ const jobPostingsSlice = createSlice({
             resume.interview = interview;
           }
         }
+      })
+      .addCase(createNewReportage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createNewReportage.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data.push(action.payload);
+      })
+      .addCase(createNewReportage.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.error.message ||
+          "An error occurred while creating the job posting";
       });
   },
 });

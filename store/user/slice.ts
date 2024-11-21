@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { loginThunk } from "@/store/thunk/login";
-import { SendKarfarmaInnerTypeThunk } from "./thunk";
+import { SendKarfarmaInnerTypeThunk, submitKarjoSignup } from "./thunk";
 import { kifpoolThunk } from "../thunk/kifpool";
 import { smsThunk } from "../thunk/sms";
 import { SMS_PRICE } from "@/core";
@@ -31,34 +31,86 @@ export interface KarfarmaType extends AllUsers {
   usertype: UserEnum.KARFARMA;
   type?: KarfarmaInnerType;
 }
-export interface KarjoType extends AllUsers {
-  usertype: UserEnum.KARJO;
-  profilePicture?: UploadFile[];
-  jobTitle: string;
-  firstName: string;
-  lastName: string;
-  birthDate: Date;
-  gender: "male" | "female";
-  location: string;
-  education: "student" | "diploma" | "bachelor" | "master" | "phd";
-  workExperience: "yes" | "no";
-  militaryService: "exempt" | "included" | "completed";
-  nationalId: string;
-  referralCode?: string;
-  educationFile?: UploadFile[];
-  workExperienceFile?: UploadFile[];
-  militaryServiceFile?: UploadFile[];
+
+export enum GenderType {
+  MALE,
+  FEMALE,
 }
 
 export enum KarjoEnum {
-  DAROKHANE = 1,
-  ARAYESHI = 2,
-  SANDOGDAR = 3,
-  ANBARDAR = 4,
-  MASOLFANI = 5,
-  GAEMMAGAM = 6,
-  KARAMOZ_DARO = 7,
-  KARAMOZ_ARAYESHI = 8,
+  DAROKHANE,
+  ARAYESHI,
+  SANDOGDAR,
+  ANBARDAR,
+  MASOLFANI,
+  GAEMMAGAM,
+  KARAMOZ_DARO,
+  KARAMOZ_ARAYESHI,
+}
+
+export enum EducationType {
+  STUDENT,
+  SIKLE,
+  DIPLOMA,
+  LISANCE,
+  ARSHAD,
+  PHD,
+}
+
+export enum HaveType {
+  NO,
+  YES,
+}
+
+export enum NezamType {
+  MOAF,
+  MASHMOL,
+  PAYAN,
+}
+
+export enum KnowType {
+  MOAREF,
+  DAROKHANE,
+  GOOGLE,
+}
+export enum ProgramType {
+  EMENAFZAR,
+  GANON,
+  FARMASI,
+  DARO_PARDAZAN,
+  MANDEGFAR,
+  VAKIL,
+}
+
+export interface KarjoType extends AllUsers {
+  usertype: UserEnum.KARJO;
+  profilePicture?: string;
+  type: KarjoEnum;
+  fName: string;
+  lName: string;
+  birthdate: Date;
+  gender: GenderType;
+  lat: number;
+  long: number;
+  knowType: KnowType;
+  referralCode?: string;
+  education: EducationType;
+  education_file?: UploadFile;
+  worked: HaveType;
+  worked_file?: UploadFile;
+  nezam: NezamType;
+  nezam_file?: UploadFile;
+  meliNo: string;
+  meliNo_file: UploadFile;
+  technician: HaveType;
+  technician_file?: UploadFile;
+  certificate: HaveType;
+  certificate_file?: UploadFile;
+  badBack: HaveType;
+  badBack_file?: UploadFile;
+  retrain: HaveType;
+  retrain_file?: UploadFile;
+  program: ProgramType;
 }
 
 export type UserType = {
@@ -144,18 +196,26 @@ const userSlice = createSlice({
         },
       },
     }));
-    builder.addCase(smsThunk.fulfilled, (state, action) => ({
-      ...state,
-      user: {
-        ...state.user,
+    builder
+      .addCase(smsThunk.fulfilled, (state, action) => ({
+        ...state,
         user: {
-          ...state?.user?.user,
-          sms: (state.user?.user?.sms || 0) + action.payload.count,
-          kifpool:
-            (state.user?.user?.kifpool || 0) - action.payload.count * SMS_PRICE,
+          ...state.user,
+          user: {
+            ...state?.user?.user,
+            sms: (state.user?.user?.sms || 0) + action.payload.count,
+            kifpool:
+              (state.user?.user?.kifpool || 0) -
+              action.payload.count * SMS_PRICE,
+          },
         },
-      },
-    }));
+      }))
+      .addCase(
+        submitKarjoSignup.fulfilled,
+        (state, action: PayloadAction<KarjoType>) => {
+          if (state.user) state.user.user = action.payload;
+        }
+      );
   },
 });
 

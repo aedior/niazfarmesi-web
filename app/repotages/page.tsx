@@ -1,149 +1,113 @@
 "use client";
 
-import Header from "@/components/header";
-// import _Frame_________Image from "@/public/selectType_fBRKpQ3.png";
-import Link from "next/link";
-import Repotagecard from "@/components/repotageCard";
-import Footer from "@/components/footer";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAppSelector, useAppDispatch } from "@/store/HOCs";
 import { getRepotages } from "@/store/thunk/repotage";
-import { Button } from "@/components/UI";
+import { Layout, Typography, ConfigProvider, Input, Button } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+import Repotagecard from "@/components/repotageCard";
+import AdvancedSearchModal from "./advanced-search-modal";
+import { KarjoEnum } from "./repotage-filter";
 
-export default function repotages() {
-  const [keywords, keywordsHandler] = useState<string>("");
-  const [type, typeHandler] = useState<number | undefined>();
-  const [isFori, isForiHandler] = useState(false);
+const { Content } = Layout;
+const { Title } = Typography;
 
-  const repotage = useAppSelector((store) => store.RepotagemodelSlice);
+export default function Repotages() {
+  const [simpleSearch, setSimpleSearch] = useState<string>("");
+  const [advancedSearchVisible, setAdvancedSearchVisible] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({
+    keywords: "",
+    tags: "",
+    type: undefined as KarjoEnum | undefined,
+    isFori: false,
+  });
+
+  const repotage = useAppSelector((store) => store.RepotagemodelSlice.data);
   const dispatch = useAppDispatch();
 
+  const handleSimpleSearch = useCallback(() => {
+    dispatch(getRepotages({ keywords: simpleSearch }));
+  }, [dispatch, simpleSearch]);
+
+  const handleAdvancedSearch = useCallback(
+    (filters: typeof advancedFilters) => {
+      setAdvancedFilters(filters);
+      dispatch(getRepotages(filters));
+      setAdvancedSearchVisible(false);
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
-    dispatch(getRepotages({}));
-  }, []);
+    handleSimpleSearch();
+  }, [handleSimpleSearch]);
+
+  const filteredRepotage = repotage.filter((job) => {
+    const matchesSimpleSearch = true;
+    // job.title.includes(simpleSearch) || job.desc.includes(simpleSearch);
+    const matchesAdvanced =
+      (!advancedFilters.keywords ||
+        job.title.includes(advancedFilters.keywords) ||
+        job.desc.includes(advancedFilters.keywords)) &&
+      (!advancedFilters.tags ||
+        job.tags.some((tag) => tag.includes(advancedFilters.tags))) &&
+      (!advancedFilters.type || job.title.includes(advancedFilters.type)) &&
+      (!advancedFilters.isFori || job.fori);
+
+    return matchesSimpleSearch && matchesAdvanced;
+  });
 
   return (
-    <div className="flex flex-col items-center rounded-0 min-w-scxeen min-h-screen space-y-69px">
-      <div className="flex flex-col rounded-0 w-full h-fit">
+    <ConfigProvider direction="rtl">
+      <Layout className="min-h-screen bg-gray-100">
         <Header />
-        <div
-          // style={{ backgroundImage: `url(${_Frame_________Image.src})` }}
-          className="flex flex-col items-center justify-center rounded-0 w-full h-500px bg-black/20"
-        >
-          <div className="flex flex-col items-center rounded-0 w-676px h-fit space-y-52px">
-            <div className="flex flex-col items-center rounded-0 w-fit h-fit space-y-32px">
-              <p className="rounded-0 w-fit h-fit text-ffffff text-center font-bold text-32px">
-                لیست آگهی‌ها
-              </p>
-              <div className="border-4 border-5e95e0 rounded-0 w-130px h-fit"></div>
-            </div>
-            <div className="flex flex-row items-center rounded-0 w-fit h-fit space-x-11px">
-              <Link
-                href={{
-                  pathname: "repotages",
-                  query: { repotage_keywords: keywords },
-                }}
-                className="flex flex-col rounded-0 w-111px h-fit min-h-40px"
+        <Content>
+          <div className="bg-blue-600 py-8 sm:py-16">
+            <div className="container mx-auto px-4">
+              <Title
+                level={1}
+                className="text-white text-center mb-4 sm:mb-8 text-2xl sm:text-4xl"
               >
-                <div className="flex flex-col items-center justify-center rounded-8 w-full h-40px bg-007ef3">
-                  <p className="rounded-0 w-fit h-fit text-ffffff font-bold text-sm">
-                    جست و جو
-                  </p>
-                </div>
-              </Link>
-              <div className="flex flex-col items-end rounded-0 w-full h-fit min-h-40px space-y-8px">
-                <input
-                  dir={"rtl"}
-                  value={keywords}
-                  onChange={(e) => keywordsHandler(e.target.value)}
-                  placeholder={"کار یا مهارت خود را جست و جو کنید"}
-                  className="flex flex-row items-center border-1 border-c4c4c4 rounded-5 w-full h-40px min-w-240px py-12px pb-12px px-16px pr-16px bg-ffffff outline-none"
+                لیست آگهی‌ها
+              </Title>
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
+                <Input
+                  placeholder="جستجوی ساده"
+                  value={simpleSearch}
+                  onChange={(e) => setSimpleSearch(e.target.value)}
+                  onPressEnter={handleSimpleSearch}
+                  style={{ width: "100%", maxWidth: "300px" }}
+                  suffix={
+                    <SearchOutlined
+                      onClick={handleSimpleSearch}
+                      style={{ cursor: "pointer" }}
+                    />
+                  }
                 />
+                <Button onClick={() => setAdvancedSearchVisible(true)}>
+                  جستجوی پیشرفته
+                </Button>
               </div>
             </div>
-            <div className="flex flex-row relative items-center rounded-0 w-fit h-fit space-x-24px">
-              <Button
-                onClick={() => {
-                  isForiHandler(!isFori);
-                }}
-                style={{
-                  backgroundColor: isFori ? "#1653c3" : "#ffffff",
-                }}
-                className="rounded-21 w-129px h-42px flex bg-212121 items-center justify-center"
-              >
-                <p
-                  style={{
-                    color: isFori ? "#FFF" : "#212121",
-                  }}
-                  className="rounded-0 w-83px h-24px text-212121 text-right font-medium text-sm"
-                >
-                  آگهی‌های فوری
-                </p>
-              </Button>
-              <Button
-                onClick={() => {
-                  typeHandler(type !== 1 ? 1 : undefined);
-                }}
-                style={{
-                  backgroundColor: type === 1 ? "#1653c3" : "#ffffff",
-                }}
-                className="rounded-21 w-129px h-42px bg-ffffff flex items-center justify-center"
-              >
-                <p
-                  style={{
-                    color: type === 1 ? "#FFF" : "#212121",
-                  }}
-                  className="rounded-0 w-97px h-26px text-212121 text-right font-medium text-base"
-                >
-                  تکنسین دارویی
-                </p>
-              </Button>
-              <Button
-                onClick={() => {
-                  typeHandler(type !== 2 ? 2 : undefined);
-                }}
-                style={{
-                  backgroundColor: type === 2 ? "#1653c3" : "#ffffff",
-                }}
-                className="rounded-21 w-129px h-42px bg-ffffff flex items-center justify-center"
-              >
-                <p
-                  style={{
-                    color: type === 2 ? "#FFF" : "#212121",
-                  }}
-                  className="rounded-0 w-58px h-26px text-212121 text-right font-medium text-base"
-                >
-                  قائم‌مقام
-                </p>
-              </Button>
-              <Button
-                onClick={() => {
-                  typeHandler(type !== 3 ? 3 : undefined);
-                }}
-                style={{
-                  backgroundColor: type === 3 ? "#1653c3" : "#ffffff",
-                }}
-                className="rounded-21 w-129px h-42px bg-ffffff flex items-center justify-center"
-              >
-                <p
-                  style={{
-                    color: type === 3 ? "#FFF" : "#212121",
-                  }}
-                  className="rounded-0 w-96px h-26px text-212121 text-right font-medium text-base"
-                >
-                  کارمند داروخانه
-                </p>
-              </Button>
+          </div>
+          <div className="container mx-auto px-4 py-8">
+            <div className="max-w-3xl mx-auto">
+              {filteredRepotage.map((job) => (
+                <Repotagecard key={job.id} {...job} />
+              ))}
             </div>
           </div>
-        </div>
-      </div>
-      <div className="grid py-16px pb-16px px-16px pr-16px gap-5">
-        {repotage.map((_d) => (
-          <Repotagecard {..._d} />
-        ))}
-      </div>
-      <Footer />
-    </div>
+        </Content>
+        <Footer />
+        <AdvancedSearchModal
+          visible={advancedSearchVisible}
+          onClose={() => setAdvancedSearchVisible(false)}
+          onSearch={handleAdvancedSearch}
+          initialFilters={advancedFilters}
+        />
+      </Layout>
+    </ConfigProvider>
   );
 }

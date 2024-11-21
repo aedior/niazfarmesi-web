@@ -13,21 +13,42 @@ import {
   Col,
   message,
 } from "antd";
-import { UploadOutlined, UserOutlined } from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
 import locale from "antd/lib/locale/fa_IR";
 import Image from "next/image";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { RcFile } from "antd/es/upload";
+import {
+  KarjoEnum,
+  GenderType,
+  KnowType,
+  EducationType,
+  HaveType,
+  NezamType,
+  ProgramType,
+  KarjoType,
+} from "@/store/user/slice";
+import { submitKarjoSignup } from "@/store/user/thunk";
+import { useAppDispatch, useAppSelector } from "@/store/HOCs";
+import { redirect } from "next/navigation";
 
 const { Option } = Select;
 
-export default function Signup() {
+export default function KarjoSignup() {
   const [form] = Form.useForm();
-  const [workExperience, setWorkExperience] = useState<string>("");
-  const [militaryService, setMilitaryService] = useState<string>("");
-  const [education, setEducation] = useState<string>("");
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user.user);
+  const [loading, setLoading] = useState(false);
 
-  const onFinish = (values: any) => {
-    console.log("Form values:", values);
+  const onFinish = async (values: KarjoType) => {
+    try {
+      await dispatch(submitKarjoSignup(values)).unwrap();
+      message.success("فرم با موفقیت ارسال شد");
+      form.resetFields();
+      redirect("/auth/call-with-you");
+    } catch (error) {
+      message.error("خطا در ارسال فرم");
+    }
   };
 
   const handleFileUpload = (info: any) => {
@@ -37,6 +58,13 @@ export default function Signup() {
     } else if (status === "error") {
       message.error(`${info.file.name} خطا در آپلود فایل.`);
     }
+  };
+
+  const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
   };
 
   return (
@@ -56,49 +84,88 @@ export default function Signup() {
               <Form form={form} layout="vertical" onFinish={onFinish}>
                 <Row gutter={16}>
                   <Col span={24}>
-                    <Form.Item name="profilePicture" label="عکس پروفایل">
-                      <Upload onChange={handleFileUpload}>
+                    <Form.Item
+                      name="profilePicture"
+                      label="عکس پروفایل"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload
+                        name="profilePicture"
+                        listType="picture"
+                        maxCount={1}
+                        beforeUpload={(file) => {
+                          const isJpgOrPng =
+                            file.type === "image/jpeg" ||
+                            file.type === "image/png";
+                          if (!isJpgOrPng) {
+                            message.error("فقط فایل‌های JPG/PNG مجاز هستند!");
+                          }
+                          return isJpgOrPng;
+                        }}
+                      >
                         <Button icon={<UploadOutlined />}>آپلود عکس</Button>
                       </Upload>
                     </Form.Item>
                   </Col>
                   <Col span={24}>
                     <Form.Item
-                      name="jobTitle"
+                      name="type"
                       label="عنوان شغلی"
-                      rules={[{ required: true }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا عنوان شغلی را انتخاب کنید",
+                        },
+                      ]}
                     >
                       <Select placeholder="انتخاب کنید">
-                        <Option value="developer">توسعه دهنده</Option>
-                        <Option value="designer">طراح</Option>
-                        <Option value="manager">مدیر</Option>
-                        <Option value="analyst">تحلیلگر</Option>
+                        {Object.entries(KarjoEnum).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
                       </Select>
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item
-                      name="firstName"
+                      name="fName"
                       label="نام"
-                      rules={[{ required: true }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا نام خود را وارد کنید",
+                        },
+                      ]}
                     >
                       <Input />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item
-                      name="lastName"
+                      name="lName"
                       label="نام خانوادگی"
-                      rules={[{ required: true }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا نام خانوادگی خود را وارد کنید",
+                        },
+                      ]}
                     >
                       <Input />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item
-                      name="birthDate"
+                      name="birthdate"
                       label="تاریخ تولد"
-                      rules={[{ required: true }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا تاریخ تولد خود را وارد کنید",
+                        },
+                      ]}
                     >
                       <DatePicker className="w-full" />
                     </Form.Item>
@@ -107,11 +174,19 @@ export default function Signup() {
                     <Form.Item
                       name="gender"
                       label="جنسیت"
-                      rules={[{ required: true }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا جنسیت خود را انتخاب کنید",
+                        },
+                      ]}
                     >
                       <Select placeholder="انتخاب کنید">
-                        <Option value="male">مرد</Option>
-                        <Option value="female">زن</Option>
+                        {Object.entries(GenderType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
                       </Select>
                     </Form.Item>
                   </Col>
@@ -119,7 +194,12 @@ export default function Signup() {
                     <Form.Item
                       name="location"
                       label="محل سکونت"
-                      rules={[{ required: true }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا محل سکونت خود را وارد کنید",
+                        },
+                      ]}
                     >
                       <Input
                         prefix={<FaMapMarkerAlt />}
@@ -129,60 +209,50 @@ export default function Signup() {
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item
-                      name="education"
-                      label="وضعیت تحصیلات"
-                      rules={[{ required: true }]}
+                      name="lat"
+                      label="عرض جغرافیایی"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا عرض جغرافیایی را وارد کنید",
+                        },
+                      ]}
                     >
-                      <Select
-                        placeholder="انتخاب کنید"
-                        onChange={(value) => setEducation(value)}
-                      >
-                        <Option value="student">دانشجو</Option>
-                        <Option value="diploma">دیپلم</Option>
-                        <Option value="bachelor">کارشناسی</Option>
-                        <Option value="master">ارشد</Option>
-                        <Option value="phd">دکتری</Option>
-                      </Select>
+                      <Input type="number" />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item
-                      name="workExperience"
-                      label="سابقه کار"
-                      rules={[{ required: true }]}
+                      name="long"
+                      label="طول جغرافیایی"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا طول جغرافیایی را وارد کنید",
+                        },
+                      ]}
                     >
-                      <Select
-                        placeholder="انتخاب کنید"
-                        onChange={(value) => setWorkExperience(value)}
-                      >
-                        <Option value="yes">بله</Option>
-                        <Option value="no">خیر</Option>
-                      </Select>
+                      <Input type="number" />
                     </Form.Item>
                   </Col>
-                  <Col xs={24} sm={12}>
+                  <Col span={24}>
                     <Form.Item
-                      name="militaryService"
-                      label="وضعیت نظام وظیفه"
-                      rules={[{ required: true }]}
+                      name="knowType"
+                      label="نحوه آشنایی"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا نحوه آشنایی را انتخاب کنید",
+                        },
+                      ]}
                     >
-                      <Select
-                        placeholder="انتخاب کنید"
-                        onChange={(value) => setMilitaryService(value)}
-                      >
-                        <Option value="exempt">معاف</Option>
-                        <Option value="included">مشمول</Option>
-                        <Option value="completed">پایان خدمت</Option>
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(KnowType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
                       </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      name="nationalId"
-                      label="شماره ملی / شماره اختصاصی"
-                      rules={[{ required: true }]}
-                    >
-                      <Input />
                     </Form.Item>
                   </Col>
                   <Col span={24}>
@@ -190,49 +260,308 @@ export default function Signup() {
                       <Input />
                     </Form.Item>
                   </Col>
-                  {education && education !== "student" && (
-                    <Col span={24}>
-                      <Form.Item name="educationFile" label="آپلود مدرک تحصیلی">
-                        <Upload onChange={handleFileUpload}>
-                          <Button icon={<UploadOutlined />}>
-                            آپلود مدرک تحصیلی
-                          </Button>
-                        </Upload>
-                      </Form.Item>
-                    </Col>
-                  )}
-                  {workExperience === "yes" && (
-                    <Col span={24}>
-                      <Form.Item
-                        name="workExperienceFile"
-                        label="آپلود سوابق کاری"
+                  <Col span={24}>
+                    <Form.Item
+                      name="education"
+                      label="تحصیلات"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا تحصیلات خود را انتخاب کنید",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(EducationType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="education_file"
+                      label="فایل مدرک تحصیلی"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload name="education_file" onChange={handleFileUpload}>
+                        <Button icon={<UploadOutlined />}>
+                          آپلود مدرک تحصیلی
+                        </Button>
+                      </Upload>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="worked"
+                      label="سابقه کار"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا وضعیت سابقه کار خود را انتخاب کنید",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(HaveType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="worked_file"
+                      label="فایل سابقه کار"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload name="worked_file" onChange={handleFileUpload}>
+                        <Button icon={<UploadOutlined />}>
+                          آپلود سابقه کار
+                        </Button>
+                      </Upload>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="nezam"
+                      label="وضعیت نظام وظیفه"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا وضعیت نظام وظیفه خود را انتخاب کنید",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(NezamType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="nezam_file"
+                      label="فایل کارت پایان خدمت"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload name="nezam_file" onChange={handleFileUpload}>
+                        <Button icon={<UploadOutlined />}>
+                          آپلود کارت پایان خدمت
+                        </Button>
+                      </Upload>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="meliNo"
+                      label="شماره ملی"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا شماره ملی خود را وارد کنید",
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="meliNo_file"
+                      label="فایل کارت ملی"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload name="meliNo_file" onChange={handleFileUpload}>
+                        <Button icon={<UploadOutlined />}>
+                          آپلود کارت ملی
+                        </Button>
+                      </Upload>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="technician"
+                      label="دارای پروانه فنی"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا وضعیت پروانه فنی خود را انتخاب کنید",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(HaveType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="technician_file"
+                      label="فایل پروانه فنی"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload
+                        name="technician_file"
+                        onChange={handleFileUpload}
                       >
-                        <Upload onChange={handleFileUpload}>
-                          <Button icon={<UploadOutlined />}>
-                            آپلود سوابق کاری
-                          </Button>
-                        </Upload>
-                      </Form.Item>
-                    </Col>
-                  )}
-                  {militaryService === "completed" && (
-                    <Col span={24}>
-                      <Form.Item
-                        name="militaryServiceFile"
-                        label="آپلود کارت پایان خدمت"
+                        <Button icon={<UploadOutlined />}>
+                          آپلود پروانه فنی
+                        </Button>
+                      </Upload>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="certificate"
+                      label="دارای گواهینامه"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا وضعیت گواهینامه خود را انتخاب کنید",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(HaveType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="certificate_file"
+                      label="فایل گواهینامه"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload
+                        name="certificate_file"
+                        onChange={handleFileUpload}
                       >
-                        <Upload onChange={handleFileUpload}>
-                          <Button icon={<UploadOutlined />}>
-                            آپلود کارت پایان خدمت
-                          </Button>
-                        </Upload>
-                      </Form.Item>
-                    </Col>
-                  )}
+                        <Button icon={<UploadOutlined />}>
+                          آپلود گواهینامه
+                        </Button>
+                      </Upload>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="badBack"
+                      label="سوء پیشینه"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا وضعیت سوء پیشینه خود را انتخاب کنید",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(HaveType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="badBack_file"
+                      label="فایل سوء پیشینه"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload name="badBack_file" onChange={handleFileUpload}>
+                        <Button icon={<UploadOutlined />}>
+                          آپلود سوء پیشینه
+                        </Button>
+                      </Upload>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="retrain"
+                      label="دوره بازآموزی"
+                      rules={[
+                        {
+                          required: true,
+                          message:
+                            "لطفا وضعیت دوره بازآموزی خود را انتخاب کنید",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(HaveType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="retrain_file"
+                      label="فایل دوره بازآموزی"
+                      valuePropName="fileList"
+                      getValueFromEvent={normFile}
+                    >
+                      <Upload name="retrain_file" onChange={handleFileUpload}>
+                        <Button icon={<UploadOutlined />}>
+                          آپلود دوره بازآموزی
+                        </Button>
+                      </Upload>
+                    </Form.Item>
+                  </Col>
+                  <Col span={24}>
+                    <Form.Item
+                      name="program"
+                      label="برنامه مورد استفاده"
+                      rules={[
+                        {
+                          required: true,
+                          message: "لطفا برنامه مورد استفاده را انتخاب کنید",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="انتخاب کنید">
+                        {Object.entries(ProgramType).map(([key, value]) => (
+                          <Option key={key} value={value}>
+                            {value}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
                 </Row>
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" className="w-full">
-                    مرحله بعد
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className="w-full"
+                    loading={loading}
+                  >
+                    ثبت نام
                   </Button>
                 </Form.Item>
               </Form>

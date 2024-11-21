@@ -1,6 +1,6 @@
 import { KarjoEnum } from "@/store/user/slice";
 
-export const SERVER_URL = "http://192.168.186.158:8000";
+export const SERVER_URL = "http://192.168.93.158:8000";
 
 export const SMS_PRICE = 10000;
 

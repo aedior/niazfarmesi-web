@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { createNewReportage } from "../thunk/createNewReportage ";
+import { getRepotages } from "../thunk/repotage";
 
 // Types
 export enum ResumeStatus {
@@ -214,6 +215,10 @@ const jobPostingsSlice = createSlice({
           action.error.message ||
           "An error occurred while creating the job posting";
       });
+    builder.addCase(getRepotages.fulfilled, (state, action) => ({
+      ...state,
+      data: action.payload,
+    }));
   },
 });
 

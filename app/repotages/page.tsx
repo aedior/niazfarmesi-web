@@ -7,7 +7,7 @@ import { Layout, Typography, ConfigProvider, Input, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import Repotagecard from "@/components/repotageCard";
+import Repotagecard from "@/components/repotage/repotageCard";
 import AdvancedSearchModal from "./advanced-search-modal";
 import { KarjoEnum } from "./repotage-filter";
 

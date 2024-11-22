@@ -47,13 +47,16 @@ export const getRepotages = createAsyncThunk(
 
 export const sendResomeThunk = createAsyncThunk(
   "sendResomeThunk",
-  async (action: { desc: string }, { rejectWithValue }) => {
+  async (
+    action: { desc: string; repotage_id: number },
+    { rejectWithValue }
+  ) => {
     console.log("request to /repotage");
-    const response = await axiosUser.post("/api/repotage", action);
+    const response = await axiosUser.post("/api/resume", action);
     console.log("response -> ", response.data);
 
     if (response.status === 200) {
-      return true;
+      return action;
     } else {
       return rejectWithValue(response.status);
     }

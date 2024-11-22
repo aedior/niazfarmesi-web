@@ -8,48 +8,60 @@ import Footer from "@/components/footer";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/HOCs";
 import { karjo2text } from "@/core";
-import { Button } from "reactstrap";
-import { IoMdClose } from "react-icons/io";
+import { Button } from "antd";
 import { sendResomeThunk } from "@/store/thunk/repotage";
 import {
-  FiCalendar,
-  FiDollarSign,
-  FiUser,
-  FiFileText,
-  FiX,
-  FiCheck,
-  FiBriefcase,
-  FiMapPin,
-} from "react-icons/fi";
+  FaCalendar,
+  FaDollarSign,
+  FaUser,
+  FaFileAlt,
+  FaTimes,
+  FaCheck,
+  FaBriefcase,
+  FaMapMarkerAlt,
+  FaPaperPlane,
+} from "react-icons/fa";
 import { ForwardRefEditor } from "@/components/editor/ref";
 import { useRouter } from "next/navigation";
+import { KarjoEnum } from "../repotage-filter";
+import EnhancedResumeButton from "@/components/repotage/EnhancedResumeButton";
 
 export default function Repotage_name(props: {
-  params: { repotage_name: string };
+  params: { repotage_id: string };
 }) {
-  const { repotage_name } = props.params;
+  const { repotage_id: _ID } = props.params;
+  const repotage_id = parseInt(_ID);
   const [showResumeModal, setShowResumeModal] = useState(false);
   const [introductionText, setIntroductionText] = useState("");
-  const repotages = useAppSelector((store) => store.RepotagemodelSlice);
-  const repotage = repotages.find((r) => r.id === parseInt(repotage_name));
+  const repotages = useAppSelector((store) => store.RepotagemodelSlice.data);
+  const repotage = repotages.find((r) => r.id === repotage_id);
   const inLogin = useAppSelector((store) => store.user.inLogin);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const hasApplied = false;
 
   if (!repotage) return null;
+
   const handleResumeSubmit = async () => {
     try {
-      await dispatch(sendResomeThunk({ desc: introductionText }));
+      await dispatch(sendResomeThunk({ desc: introductionText, repotage_id }));
       setShowResumeModal(false);
       // Show success message
     } catch (error) {
       // Show error message
     }
   };
+
+  const handleResumeButtonClick = () => {
+    if (inLogin !== "accepted") {
+      router.push("/auth");
+    } else {
+      setShowResumeModal(true);
+    }
+  };
   return (
     <>
-      <div className="flex flex-col items-center w-full min-h-screen bg-f5f5f5">
+      <div className="flex flex-col items-center w-full min-h-screen bg-gray-100">
         <Header />
         <main className="flex flex-col items-center w-full mb-5">
           <div className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white">
@@ -73,38 +85,26 @@ export default function Repotage_name(props: {
                       ))}
                     </div>
                   )}
-                  {hasApplied ? (
-                    <div className="flex items-center space-x-2 bg-green-500 text-white py-2 px-4 rounded-md">
-                      <FiCheck />
-                      <span>شما قبلاً درخواست داده‌اید</span>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        if (inLogin != "accepted") router.push("/auth");
-                        else setShowResumeModal(true);
-                      }}
-                      className="bg-white text-blue-600 py-2 px-6 rounded-md hover:bg-blue-50 transition-colors text-lg font-semibold"
-                    >
-                      ارسال رزومه
-                    </button>
-                  )}
+                  <EnhancedResumeButton
+                    onClick={handleResumeButtonClick}
+                    hasApplied={repotage.resumeSended || false}
+                  />
                 </div>
                 <div className="flex flex-row items-center">
                   <div className="mb-6 md:mb-0 text-center md:text-right">
                     <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                      نیازمند یک {karjo2text[repotage.onvan]} هستیم
+                      نیازمند یک {karjo2text[repotage.title as KarjoEnum]} هستیم
                     </h1>
                     <div className="flex flex-col md:flex-row-reverse items-center md:items-start space-y-2 md:space-y-0 md:space-x-4">
                       <div className="flex items-center space-x-2 mx-2 relative">
                         <div className="pr-8">
-                          <span>{repotage.drugstoreName}</span>
-                          <FiBriefcase className="text-white" />
+                          <span>{repotage.fromKarfarma.name}</span>
+                          <FaBriefcase className="text-white" />
                         </div>
                       </div>
                       <div className="flex items-center mx-2 space-x-2">
                         <span>{repotage.lat}</span>
-                        <FiMapPin className="text-white" />
+                        <FaMapMarkerAlt className="text-white" />
                       </div>
                     </div>
                   </div>
@@ -123,7 +123,7 @@ export default function Repotage_name(props: {
             <div className="bg-white p-6 rounded-lg shadow-md">
               <p className="font-bold text-xl text-gray-800 mb-6">نگاه سریع</p>
               <div className="flex items-center space-x-4 mb-5">
-                <FiCalendar className="text-blue-500 text-2xl" />
+                <FaCalendar className="text-blue-500 text-2xl" />
                 <div className="flex flex-col">
                   <p className="text-base font-medium text-gray-700">
                     تاریخ ارسال این آگهی
@@ -134,7 +134,7 @@ export default function Repotage_name(props: {
                 </div>
               </div>
               <div className="flex items-center space-x-4 mb-5">
-                <FiMapPin className="text-blue-500 text-2xl" />
+                <FaMapMarkerAlt className="text-blue-500 text-2xl" />
                 <div className="flex flex-col">
                   <p className="text-base font-medium text-gray-700">
                     موقعیت مکانی شغل
@@ -143,7 +143,7 @@ export default function Repotage_name(props: {
                 </div>
               </div>
               <div className="flex items-center space-x-4 mb-5">
-                <FiDollarSign className="text-blue-500 text-2xl" />
+                <FaDollarSign className="text-blue-500 text-2xl" />
                 <div className="flex flex-col">
                   <p className="text-base font-medium text-gray-700">
                     حقوق پیشنهادی
@@ -152,7 +152,7 @@ export default function Repotage_name(props: {
                 </div>
               </div>
               <div className="flex items-center space-x-4 mb-5">
-                <FiUser className="text-blue-500 text-2xl" />
+                <FaUser className="text-blue-500 text-2xl" />
                 <div className="flex flex-col">
                   <p className="text-base font-medium text-gray-700">
                     تجربه موردنیاز
@@ -161,7 +161,7 @@ export default function Repotage_name(props: {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <FiFileText className="text-blue-500 text-2xl" />
+                <FaFileAlt className="text-blue-500 text-2xl" />
                 <div className="flex flex-col">
                   <p className="text-base font-medium text-gray-700">
                     مدرک موردنیاز
@@ -187,14 +187,14 @@ export default function Repotage_name(props: {
         <Footer />
 
         {showResumeModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl">
               <div className="flex justify-between items-center mb-4">
                 <button
                   onClick={() => setShowResumeModal(false)}
                   className="text-gray-500 hover:text-gray-700"
                 >
-                  <FiX size={24} />
+                  <FaTimes size={24} />
                 </button>
                 <h2 className="text-2xl font-bold">ارسال رزومه</h2>
               </div>
@@ -212,14 +212,15 @@ export default function Repotage_name(props: {
                   className="border border-gray-300 rounded-md shadow-sm min-h-[200px] focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
               </div>
-              <div className="mt-6">
-                <button
-                  onClick={handleResumeSubmit}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-                >
-                  ارسال رزومه
-                </button>
-              </div>
+              <Button
+                onClick={handleResumeSubmit}
+                type="primary"
+                htmlType="submit"
+                icon={<FaPaperPlane />}
+                block
+              >
+                ارسال رزومه
+              </Button>
             </div>
           </div>
         )}

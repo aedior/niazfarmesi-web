@@ -129,7 +129,7 @@ const initialState: {
   //   phone: 123123123,
   //   type: UserEnum.KARFARMA,
   //   access:
-  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDE4OTE1LCJpYXQiOjE3MzE5MzI1MTUsImp0aSI6IjE1OTg5YjU4OGVlYjQyMWE4ZjY3M2MxNDI1MTlhOGRlIiwidXNlcl9pZCI6Mn0.or84wwu7GQYTpyfOB1DaHOJFWZQc0XgcJOMJUPAAbtg",
+  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzY2MjMzLCJpYXQiOjE3MzIyNzk4MzMsImp0aSI6IjI1NTQ4NzIwMTI1NDQ1ODdhZDQyYWNlYmE4ZmVlZjQxIiwidXNlcl9pZCI6NX0.WKYTeNSFPLkEmd9rHLFBbpvnCI27zXLR1p_UfnmSTSY",
   //   user: {
   //     id: 1,
   //     active: true,

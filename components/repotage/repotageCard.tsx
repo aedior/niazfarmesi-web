@@ -20,10 +20,7 @@ const genderMap = {
 
 export default function Repotagecard(job: JobPosting) {
   return (
-    <div
-      style={{ direction: "rtl" }}
-      className="bg-white rounded-lg shadow-md p-4 mb-4 hover:bg-gray-50 transition duration-150 ease-in-out"
-    >
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4 hover:bg-gray-50 transition duration-150 ease-in-out">
       <div className="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-3 sm:space-x-reverse">
         <img
           src={job.fromKarfarma.logo}

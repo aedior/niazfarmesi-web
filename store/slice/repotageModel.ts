@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { createNewReportage } from "../thunk/createNewReportage ";
-import { getRepotages } from "../thunk/repotage";
+import { getRepotages, sendResomeThunk } from "../thunk/repotage";
 
 // Types
 export enum ResumeStatus {
@@ -62,6 +62,7 @@ export interface JobPosting {
     name: string;
     logo: string;
   };
+  resumeSended?: boolean;
 }
 
 interface JobPostingsState {
@@ -214,6 +215,13 @@ const jobPostingsSlice = createSlice({
         state.error =
           action.error.message ||
           "An error occurred while creating the job posting";
+      })
+      .addCase(sendResomeThunk.fulfilled, (state, action) => {
+        const { repotage_id } = action.payload;
+        const job = state.data.find((job) => job.id === repotage_id);
+        if (job) {
+          job.resumeSended = true;
+        }
       });
     builder.addCase(getRepotages.fulfilled, (state, action) => ({
       ...state,

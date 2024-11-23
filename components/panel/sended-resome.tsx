@@ -231,9 +231,6 @@ const JobBoard: React.FC = () => {
     <>
       <div className="bg-gray-100 min-h-screen p-4" dir="rtl">
         <Space direction="vertical" size="large" className="w-full">
-          <Title level={3} className="text-center text-gray-800">
-            تابلوی شغلی
-          </Title>
           <Table
             columns={columns}
             dataSource={jobPostings}

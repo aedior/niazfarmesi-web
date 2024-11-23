@@ -10,7 +10,6 @@ import {
   Card,
   message,
   Space,
-  ConfigProvider,
   Checkbox,
 } from "antd";
 import {
@@ -347,38 +346,20 @@ export default function FormAgahiShoghli() {
   };
 
   return (
-    <ConfigProvider
-      locale={fa_IR}
-      direction="rtl"
-      theme={{
-        components: {
-          Input: {
-            controlHeight: 40,
-            controlHeightLG: 48,
-            fontSizeLG: 16,
-          },
-          Select: {
-            controlHeight: 40,
-            controlHeightLG: 48,
-            fontSizeLG: 16,
-          },
-          InputNumber: {
-            controlHeight: 40,
-            controlHeightLG: 48,
-            fontSizeLG: 16,
-          },
-        },
-      }}
-    >
+    <>
       <div className="mx-auto p-6 space-y-8 w-full bg-white rounded-xl">
-        <h1 className="text-3xl font-bold text-center">ایجاد آگهی شغلی جدید</h1>
         {isPreviewMode ? renderPreview() : renderForm()}
         <div className="flex justify-end space-x-4 rtl:space-x-reverse pt-5">
           <Button size="large" onClick={() => setIsPreviewMode(!isPreviewMode)}>
             {isPreviewMode ? "ویرایش" : "پیش‌نمایش"}
           </Button>
           {!isPreviewMode && (
-            <Button size="large" type="primary" onClick={() => form.submit()}>
+            <Button
+              size="large"
+              type="primary"
+              onClick={() => form.submit()}
+              className="bg-1967d2"
+            >
               ایجاد آگهی شغلی
             </Button>
           )}
@@ -414,6 +395,6 @@ export default function FormAgahiShoghli() {
           font-size: 16px;
         }
       `}</style>
-    </ConfigProvider>
+    </>
   );
 }

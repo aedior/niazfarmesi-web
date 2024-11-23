@@ -13,7 +13,6 @@ import {
   TitledTextArea,
 } from "@/components/UI";
 import Selfrepotage from "@/components/selfRepotage";
-import Menu from "../menu";
 import DASHBOARD from "./dashboard";
 import PROFILE from "./profile";
 import NEW_REPOTAGE from "./newRepotage";
@@ -22,8 +21,9 @@ import SENDED_RESOME from "./sended-resome";
 import SENDED_REPOTAGE from "./sended-repotage";
 import SMS_PANEL from "./sms-panel";
 import EVENTS from "./events";
-import COMMENTS from "./comments";
-import { kifpoolThunk } from "@/store/thunk/kifpool";
+import { ConfigProvider } from "antd";
+import fa_IR from "antd/lib/locale/fa_IR";
+import Menu, { KarfarmaPanelItem } from "../menu";
 
 function Select_select16() {
   return (
@@ -181,18 +181,6 @@ function Select_select10() {
   );
 }
 
-enum KarfarmaPanelItem {
-  DASHBOARD,
-  PROFILE,
-  NEW_REPOTAGE,
-  KIFPOOL,
-  SENDED_RESOME,
-  SENDED_REPOTAGE,
-  SMS_PANEL,
-  EVENTS,
-  COMMENTS,
-}
-
 const panel = {
   [KarfarmaPanelItem.DASHBOARD]: <DASHBOARD />,
   [KarfarmaPanelItem.PROFILE]: <PROFILE />,
@@ -204,32 +192,24 @@ const panel = {
   [KarfarmaPanelItem.EVENTS]: <EVENTS />,
   // select10: <Select_select10 />,
   // select16: <Select_select16 />,
-  [KarfarmaPanelItem.COMMENTS]: <COMMENTS />,
 };
 
 export default function karfarmaPanel() {
-  const [select, selectHandler] = useState<keyof typeof panel>(
-    KarfarmaPanelItem.KIFPOOL
+  const [selectedItem, setSelectedItem] = useState<KarfarmaPanelItem>(
+    KarfarmaPanelItem.DASHBOARD
   );
 
+  const handleMenuSelect = (item: KarfarmaPanelItem) => {
+    setSelectedItem(item);
+    // Add any additional logic for menu item selection
+  };
+
   return (
-    <div className="flex flex-row space-x-5 h-full w-full container">
-      <div className="flex flex-col w-full">{panel[select]}</div>
-      <Menu
-        menu_items={{
-          [KarfarmaPanelItem.DASHBOARD]: "داشبورد",
-          [KarfarmaPanelItem.PROFILE]: "پروفایل من",
-          [KarfarmaPanelItem.NEW_REPOTAGE]: "ثبت آگهی جدید",
-          [KarfarmaPanelItem.KIFPOOL]: "کیف پول",
-          [KarfarmaPanelItem.SENDED_RESOME]: "رزومه‌های ارسالی",
-          //   [KarfarmaPanelItem.SENDED_REPOTAGE]: "آگهی‌های ارسالی",
-          [KarfarmaPanelItem.SMS_PANEL]: "پنل پیامک",
-          [KarfarmaPanelItem.EVENTS]: "رویدادهای مهم",
-          [KarfarmaPanelItem.COMMENTS]: "نظرات",
-        }}
-        handler={selectHandler}
-        select={select}
-      />
-    </div>
+    <ConfigProvider locale={fa_IR} direction="rtl">
+      <div className="flex flex-row space-x-5 h-full w-full container">
+        <div className="flex flex-col w-full">{panel[selectedItem]}</div>
+        <Menu selectedItem={selectedItem} onSelect={handleMenuSelect} />
+      </div>
+    </ConfigProvider>
   );
 }

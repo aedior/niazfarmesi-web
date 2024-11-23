@@ -55,9 +55,9 @@ export default function ProfilePanel() {
       onFinish={onFinish}
       layout="vertical"
       className="rtl-form"
-      style={{ maxWidth: 800, margin: "0 auto" }}
+      style={{ margin: "0 auto" }}
     >
-      <Card title={<Title level={4}>پروفایل من</Title>} className="mb-4">
+      <Card title={<Title level={4}>اطلاعات اولیه</Title>} className="mb-4">
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
@@ -118,7 +118,6 @@ export default function ProfilePanel() {
           </Col>
         </Row>
       </Card>
-
       <Card title={<Title level={4}>شبکه‌های اجتماعی</Title>} className="mb-4">
         <Row gutter={16}>
           <Col span={12}>
@@ -133,7 +132,6 @@ export default function ProfilePanel() {
           </Col>
         </Row>
       </Card>
-
       <Card title={<Title level={4}>اطلاعات تماس</Title>} className="mb-4">
         <Row gutter={16}>
           <Col span={12}>
@@ -157,7 +155,7 @@ export default function ProfilePanel() {
       </Card>
 
       <Form.Item>
-        <Button type="primary" htmlType="submit" className="w-full">
+        <Button type="primary" htmlType="submit" className="w-full bg-1967d2">
           ویرایش اطلاعات
         </Button>
       </Form.Item>

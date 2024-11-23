@@ -50,10 +50,6 @@ const EVENTS: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-100 rounded-lg" dir="rtl">
-      <Title level={2} className="mb-6 text-right">
-        داشبورد رویدادها و هشدارها
-      </Title>
-
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={16}>
           <Card

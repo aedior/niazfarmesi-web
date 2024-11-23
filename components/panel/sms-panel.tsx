@@ -45,8 +45,6 @@ const SMS_PANEL: React.FC = () => {
     | undefined;
   const dispatch = useAppDispatch();
 
-  if (user === undefined) return null;
-
   const price = count * SMS_PRICE;
 
   const handleCountChange = (value: number | null) => {
@@ -104,15 +102,15 @@ const SMS_PANEL: React.FC = () => {
                 موجودی کیف پول پس از خرید:{" "}
                 <span
                   className={
-                    user.kifpool - price <= 0
+                    user?.kifpool || 0 - price <= 0
                       ? "text-red-500"
                       : "text-green-500"
                   }
                 >
-                  {user.kifpool - price <= 0
+                  {user?.kifpool || 0 - price <= 0
                     ? "موجودی ناکافی"
                     : `${new Intl.NumberFormat("fa-IR").format(
-                        user.kifpool - price
+                        user?.kifpool || 0 - price
                       )} تومان`}
                 </span>
               </p>
@@ -131,7 +129,7 @@ const SMS_PANEL: React.FC = () => {
                 پیامک‌های باقیمانده
               </h3>
               <h1 className="text-white text-5xl font-bold m-0">
-                {new Intl.NumberFormat("fa-IR").format(user.sms)}
+                {new Intl.NumberFormat("fa-IR").format(user?.sms || 0)}
               </h1>
               <p className="text-white text-2xl font-semibold">عدد</p>
               <div className="flex items-center space-x-2 bg-blue-700 bg-opacity-30 rounded-full px-4 py-2">

@@ -1,5 +1,6 @@
 import { axiosUser } from "@/core/axios";
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { updateUserProfile } from "./updateProfile";
 
 // Types
 export enum ResumeStatus {

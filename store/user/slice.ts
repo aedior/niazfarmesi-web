@@ -5,6 +5,7 @@ import { kifpoolThunk } from "../thunk/kifpool";
 import { smsThunk } from "../thunk/sms";
 import { SMS_PRICE } from "@/core";
 import type { UploadFile } from "antd/es/upload/interface";
+import { updateUserProfile } from "../thunk/updateProfile";
 
 export enum UserEnum {
   KARFARMA = 1,
@@ -216,6 +217,11 @@ const userSlice = createSlice({
           if (state.user) state.user.user = action.payload;
         }
       );
+    builder.addCase(updateUserProfile.fulfilled, (state, action) => {
+      if (state.user && state.user.user) {
+        state.user.user = { ...state.user.user, ...action.payload };
+      }
+    });
   },
 });
 

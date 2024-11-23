@@ -10,6 +10,7 @@ import md5 from "md5";
 import { loginThunk } from "@/store/thunk/login";
 import { CgSpinner } from "react-icons/cg";
 import OTPInput from "@/components/otp";
+import { UserEnum } from "@/store/user/slice";
 
 export default function PhoneKarfarmaOTP() {
   const [code, setCode] = useState("");
@@ -40,7 +41,11 @@ export default function PhoneKarfarmaOTP() {
         })
       );
       message.success("ورود موفقیت‌آمیز");
-      router.push("/dashboard");
+      router.push(
+        user?.user?.dataAccepted
+          ? `/panel/${user?.type == UserEnum.KARFARMA ? "karfarma" : "karjo"}`
+          : "/auth/accept"
+      );
     } catch (error) {
       message.error("خطا در ورود. لطفا دوباره تلاش کنید");
     } finally {
@@ -89,7 +94,9 @@ export default function PhoneKarfarmaOTP() {
               )}
             </Button>
             <Link
-              href="/auth/register"
+              href={`/auth/${
+                user?.type == UserEnum.KARFARMA ? "karfarma" : "karjo"
+              }`}
               className="block text-gray-600 hover:text-gray-800"
             >
               حساب کاربری ندارید ؟ ثبت‌نام کنید

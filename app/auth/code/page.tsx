@@ -1,112 +1,99 @@
 "use client";
 
+import { Button, message } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import OTP_Input from "@/components/otp";
 import { useEffect, useState } from "react";
-import { axios4Auth } from "@/core/axios";
 import { useAppDispatch, useAppSelector } from "@/store/HOCs";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import md5 from "md5";
 import { loginThunk } from "@/store/thunk/login";
-import { Button } from "@/components/UI";
 import { CgSpinner } from "react-icons/cg";
-import { useRouter } from "next/navigation";
-import { UserEnum } from "@/store/user/slice";
+import OTPInput from "@/components/otp";
 
-export default function phoneKarfarmaOTP() {
-  const [code, codeHandler] = useState("");
-  const [wait, waitHandler] = useState(false);
+export default function PhoneKarfarmaOTP() {
+  const [code, setCode] = useState("");
+  const [wait, setWait] = useState(false);
   const user = useAppSelector((store) => store.user.user);
   const phone = user?.phone;
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  if (phone === undefined) {
-    return redirect("/auth/role");
-  }
-
   useEffect(() => {
-    // FIXME: code length better
-    if (code.length >= 6) {
-      dispatch(
+    if (!phone) {
+      router.push("/auth/role");
+    }
+  }, [phone, router]);
+
+  const handleLogin = async () => {
+    if (code.length !== 6) {
+      message.error("لطفا کد 6 رقمی را وارد کنید");
+      return;
+    }
+
+    setWait(true);
+    try {
+      await dispatch(
         loginThunk({
-          username: phone,
+          username: phone!,
           password: `${md5(code)}@niazfarmesi`,
         })
       );
+      message.success("ورود موفقیت‌آمیز");
+      router.push("/dashboard");
+    } catch (error) {
+      message.error("خطا در ورود. لطفا دوباره تلاش کنید");
+    } finally {
+      setWait(false);
     }
-  }, [code]);
+  };
 
   return (
-    <div
-      //   style={{ backgroundImage: `url(${_phoneKarfarmaOTPImage.src})` }}
-      className="flex flex-col rounded-0 w-full min-h-screen bg-black/10 items-center justify-center bg-black/20"
-    >
-      <div className="flex flex-row rounded-24 w-970px h-fit py-24px pb-24px px-24px pr-24px space-x-24px drop-shadow-0px12px-000000 bg-ffffff">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl p-6 md:p-8 flex flex-col md:flex-row gap-6">
         <Image
-          src={"/Rectangle_4_KuUNmqr.png"}
-          alt={"Rectangle 4"}
-          width={"0"}
-          height={"0"}
-          sizes={"100vw"}
-          className="rounded-16 w-374px h-725px"
+          src="/Rectangle_4_KuUNmqr.png"
+          alt="Rectangle 4"
+          width={374}
+          height={725}
+          className="rounded-lg object-cover hidden md:block"
         />
-        <div className="flex flex-col items-center justify-center rounded-0 w-full h-full space-y-61px">
+        <div className="flex flex-col items-center justify-center w-full space-y-8">
           <Image
-            src={"/logo.png"}
-            alt={"logo"}
-            width={"0"}
-            height={"0"}
-            sizes={"100vw"}
-            className="flex flex-col items-center justify-center rounded-0 w-140px h-140px"
+            src="/logo.png"
+            alt="logo"
+            width={140}
+            height={140}
+            className="object-contain"
           />
-          <div className="flex flex-col items-center rounded-0 w-418px h-fit space-y-88px">
-            <div className="flex flex-col items-center rounded-0 w-full h-fit py-10px pb-10px px-10px pr-10px">
-              <div className="flex flex-col items-center rounded-0 w-full h-fit space-y-24px">
-                <p className="rounded-0 w-full h-fit text-212121 text-center font-bold text-xl">
-                  به نیازفارمسی خوش آمدید
-                </p>
-                <p className="rounded-0 w-full h-fit text-212121 font-bold text-2xl">
-                  لطفا برای ثبت نام، اطلاعات زیر را وارد کنید
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col items-center rounded-0 w-260px h-fit space-y-36px">
-              <p className="rounded-0 w-full h-fit text-212121 text-center font-bold text-xl">
-                کد ارسال شده را وارد کنید
-              </p>
-              <OTP_Input
-                onEnd={() => {
-                  waitHandler(true);
-                }}
-                onChange={(num: number) => {
-                  codeHandler(num.toString());
-                }}
-              />
-            </div>
-            <div className="flex flex-col items-center rounded-0 w-373px h-fit space-y-19px">
-              <Button
-                onClick={async () => {
-                  waitHandler(true);
-                }}
-                className="flex flex-row items-center justify-center rounded-8 w-full h-14 py-12px pb-12px px-20px pr-20px bg-1967d2"
-              >
-                {wait ? (
-                  <CgSpinner className="text-white/80 text-3xl animate-spin" />
-                ) : (
-                  <p className="rounded-0 w-fit h-fit text-ffffff text-right font-medium text-sm">
-                    ورود به حساب کاربری
-                  </p>
-                )}
-              </Button>
-              <Link
-                href={"login"}
-                className="rounded-0 w-full h-fit text-212121 text-center font-medium text-base"
-              >
-                حساب کاربری ندارید ؟ ثبت‌نام کنید
-              </Link>
-            </div>
+          <div className="text-center space-y-6 w-full max-w-md">
+            <h1 className="text-2xl font-bold text-gray-800">
+              به نیازفارمسی خوش آمدید
+            </h1>
+            <p className="text-lg font-semibold text-gray-700">
+              لطفا برای ثبت نام، اطلاعات زیر را وارد کنید
+            </p>
+            <p className="text-md font-medium text-gray-600">
+              کد ارسال شده را وارد کنید
+            </p>
+            <OTPInput length={6} onComplete={setCode} />
+            <Button
+              onClick={handleLogin}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-lg"
+              disabled={wait}
+            >
+              {wait ? (
+                <CgSpinner className="animate-spin mx-auto text-2xl" />
+              ) : (
+                "ورود به حساب کاربری"
+              )}
+            </Button>
+            <Link
+              href="/auth/register"
+              className="block text-gray-600 hover:text-gray-800"
+            >
+              حساب کاربری ندارید ؟ ثبت‌نام کنید
+            </Link>
           </div>
         </div>
       </div>

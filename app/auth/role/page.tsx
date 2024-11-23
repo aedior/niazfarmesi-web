@@ -1,90 +1,66 @@
 "use client";
 
-// import _selectTypeImage from "@/public/selectType_fBRKpQ3.png";
 import Image from "next/image";
 import Link from "next/link";
+import { Card, Typography, Space, Button } from "antd";
+import { UserOutlined, TeamOutlined } from "@ant-design/icons";
 
-export default function selectType() {
+const { Title, Text } = Typography;
+
+export default function SelectType() {
   return (
-    <div
-      // style={{ backgroundImage: `url(${_selectTypeImage.src})` }}
-      className="flex flex-col rounded-0 w-full min-h-screen items-center justify-center bg-212121/10"
-    >
-      <div className="flex flex-row rounded-24 w-970px h-fit py-24px pb-24px px-24px pr-24px space-x-24px drop-shadow-0px12px-000000 bg-ffffff">
-        <Image
-          src={"/Rectangle_4_KuUNmqr.png"}
-          alt={"Rectangle 4"}
-          width={"0"}
-          height={"0"}
-          sizes={"100vw"}
-          className="rounded-16 w-374px h-725px"
-        />
-
-        <div className="flex flex-col items-center justify-center rounded-0 w-full h-full space-y-61px">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <Card className="w-full max-w-4xl shadow-lg">
+        <div className="flex flex-col md:flex-row gap-6">
           <Image
-            src={"/logo.png"}
-            alt={"logo"}
-            width={"0"}
-            height={"0"}
-            sizes={"100vw"}
-            className="flex flex-col items-center justify-center  w-140px h-140px"
+            src="/Rectangle_4_KuUNmqr.png"
+            alt="Rectangle 4"
+            width={374}
+            height={725}
+            className="rounded-lg object-cover"
           />
-          <div className="flex flex-col items-center rounded-0 w-373px h-fit space-y-59px">
-            <p className="rounded-0 w-full h-fit text-212121 text-center font-bold text-xl">
-              به نیازفارمسی خوش آمدید
-            </p>
-            <p className="rounded-0 w-full h-fit text-212121 text-center font-bold text-2xl">
-              لطفا برای ایجاد آگهی، ثبت‌نام کنید
-            </p>
-            <p className="rounded-0 w-full h-fit text-212121 text-center font-bold text-xl">
-              ابتدا نقش خود را انتخاب کنید
-            </p>
-            <div className="flex flex-col items-center rounded-0 w-full h-fit space-y-21px">
-              <div className="flex flex-row items-center justify-center rounded-0 w-full h-fit space-x-44px">
-                <Link
-                  href={"/auth/karjo"}
-                  className="flex flex-col hover:bg-blue-200 rounded-xl border-2 items-center justify-center w-40 h-40 space-y-5"
-                >
-                  <Image
-                    src="Vector_TTQC1Fp.svg"
-                    sizes="100vw"
-                    width={0}
-                    height={0}
-                    alt=""
-                    className="h-10 w-10 "
-                  />
-                  <p className="font-bold ">کارجو</p>
+          <div className="flex flex-col items-center justify-center w-full space-y-6">
+            <Image
+              src="/logo.png"
+              alt="logo"
+              width={140}
+              height={140}
+              className="object-contain"
+            />
+            <Space
+              direction="vertical"
+              align="center"
+              className="w-full max-w-md text-center"
+            >
+              <Title level={3}>به نیازفارمسی خوش آمدید</Title>
+              <Title level={2}>لطفا برای ایجاد آگهی، ثبت‌نام کنید</Title>
+              <Title level={3}>ابتدا نقش خود را انتخاب کنید</Title>
+              <Space size="large" className="my-6">
+                <Link href="/auth/karjo">
+                  <Button
+                    type="default"
+                    size="large"
+                    icon={<UserOutlined />}
+                    className="flex flex-col items-center justify-center w-40 h-40 text-lg hover:bg-blue-100"
+                  >
+                    کارجو
+                  </Button>
                 </Link>
-                <Link
-                  href={"/auth/karfarma"}
-                  className="flex flex-col hover:bg-blue-200 rounded-xl border-2 items-center justify-center w-40 h-40 space-y-5"
-                >
-                  <Image
-                    src="Vector_TTQC1Fp.svg"
-                    sizes="100vw"
-                    width={0}
-                    height={0}
-                    alt=""
-                    className="h-10 w-10 "
-                  />
-                  <p className="font-bold ">کارفرما</p>
+                <Link href="/auth/karfarma">
+                  <Button
+                    type="default"
+                    size="large"
+                    icon={<TeamOutlined />}
+                    className="flex flex-col items-center justify-center w-40 h-40 text-lg hover:bg-blue-100"
+                  >
+                    کارفرما
+                  </Button>
                 </Link>
-              </div>
-              <div className="flex flex-row justify-center rounded-0 w-full h-fit space-x-16px">
-                <Link
-                  href={"login"}
-                  className="rounded-0 w-fit h-fit text-1967d2 text-center font-medium text-13px underline"
-                >
-                  وارد شوید
-                </Link>
-                <p className="rounded-0 w-fit h-fit text-212121 text-center font-medium text-13px">
-                  حساب کاربری دارید ؟
-                </p>
-              </div>
-            </div>
+              </Space>
+            </Space>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

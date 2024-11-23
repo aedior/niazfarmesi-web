@@ -2,7 +2,6 @@ import { configureStore, Action, ThunkAction } from "@reduxjs/toolkit";
 import MessagesmodelSlice from "@/store/slice/messagesModel";
 import RepotagemodelSlice from "@/store/slice/repotageModel";
 import BlogsmodelSlice from "@/store/slice/blogsModel";
-import ContactmodelSlice from "@/store/slice/contactModel";
 import StoresmodelSlice from "@/store/slice/storesModel";
 import DrugstoresmodelSlice from "@/store/slice/drugstoresModel";
 import KarjomodelSlice from "@/store/slice/karjoModel";
@@ -19,7 +18,6 @@ export const store = configureStore({
     MessagesmodelSlice,
     RepotagemodelSlice,
     BlogsmodelSlice,
-    ContactmodelSlice,
     StoresmodelSlice,
     DrugstoresmodelSlice,
     KarjomodelSlice,

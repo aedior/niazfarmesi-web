@@ -301,5 +301,8 @@ const config: Config = {
     },
   },
   plugins: [],
+  corePlugins: {
+    preflight: false, // This is important to prevent Tailwind from overriding Ant Design's base styles
+  },
 };
 export default config;
